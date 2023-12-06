@@ -1,10 +1,5 @@
 import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
-import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
-import advancedSearchConfig from '../config/advancedSearchConfig.json';
-import ipsMediator from '../config/ipsMediatorConfig.json';
-import fhirBaseMediator from '../config/fhirBaseConfig.json'
-import bundleSupportMediator from '../config/fhirBaseBundleSupport.json'
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
@@ -16,12 +11,7 @@ import { exists } from 'fs';
 
 // mediators to be registered
 const mediators = [
-    shrMediatorConfig,
-    advancedSearchConfig,
-    mpiMediatorConfig,
-    ipsMediator,
-    fhirBaseMediator,
-    bundleSupportMediator
+    shrMediatorConfig
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
@@ -131,7 +121,7 @@ export const parseIdentifiers = async (patientId: string) => {
 
 export const sendRequest = async () => {
     let headers = await getOpenHIMToken();
-    [shrMediatorConfig.urn, mpiMediatorConfig.urn].map(async (urn: string) => {
+    [shrMediatorConfig.urn].map(async (urn: string) => {
         let response = await (await fetch(`${openhimApiUrl}/patients`, {
             headers: { ...headers, "Content-Type": "application/json" }, method: 'POST', body: JSON.stringify({ a: "y" }), agent: new Agent({
                 rejectUnauthorized: false

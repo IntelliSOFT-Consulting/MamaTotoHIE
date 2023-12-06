@@ -6,7 +6,6 @@ networks:
     cloudbuild: 
         external: true
 
-
 services:
     mongo:
         container_name: openhim-mongo
