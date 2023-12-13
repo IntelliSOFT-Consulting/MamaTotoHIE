@@ -1,7 +1,7 @@
 {
   "version": "1.18.2",
   "minimumCoreVersion": "5.2.0",
-  "protocol": "http",
+  "protocol": "https",
   "host": "iol-dev.pharmaccess.org",
   "hostPath": "",
   "port": "8080",
