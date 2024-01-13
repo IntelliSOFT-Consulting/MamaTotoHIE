@@ -106,8 +106,8 @@ services:
         image: nginx:alpine
         container_name: nginx
         restart: unless-stopped
-        # env_file:
-            # - .env
+        env_file:
+            - .env
         networks:
             - openhim
             - hapi-fhir
