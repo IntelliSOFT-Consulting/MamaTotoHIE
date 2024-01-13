@@ -1,10 +1,10 @@
 {
   "version": "1.18.2",
   "minimumCoreVersion": "5.2.0",
-  "protocol": "http",
-  "host": "iol-dev.pharmaccess.org",
+  "protocol": "https",
+  "host": "openhim-comms.mamatoto.pharmaccess.io",
   "hostPath": "",
-  "port": "8080",
+  "port": "",
   "title": "MamaToto HIE",
   "footerTitle": "MamaToto HIE Administration Console",
   "footerPoweredBy": "<a href='http://openhim.org/' target='_blank'>Powered by OpenHIM</a>",

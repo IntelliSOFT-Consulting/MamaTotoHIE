@@ -32,7 +32,6 @@ hapi:
     bulk_export_enabled: true
     default_pretty_print: true
     cql_enabled: true
-    ips_enabled: true
     advanced_lucene_indexing: true
     #    defer_indexing_for_codesystems_of_size: 101
     #    install_transitive_ig_dependencies: true
@@ -54,7 +53,7 @@ hapi:
     #    allow_external_references: true
     #    allow_multiple_delete: true
     #    allow_override_default_search_params: true
-    #    auto_create_placeholder_reference_targets: false
+    auto_create_placeholder_reference_targets: true
     #default_encoding: JSON
     #    default_page_size: 20
     #    delete_expunge_enabled: true
@@ -72,7 +71,7 @@ hapi:
     filter_search_enabled: true
     graphql_enabled: true
     #    narrative_enabled: true
-    # mdm_enabled: true
+    mdm_enabled: true
     local_base_urls:
       - http://shr-dev.pharmaccess.org/fhir
 
@@ -123,15 +122,15 @@ hapi:
     #      requests_enabled: true
     #      responses_enabled: true
     #    binary_storage_enabled: true
-#    subscription:
-#      resthook_enabled: true
-#      websocket_enabled: false
-#      email:
-#        from: some@test.com
-#        host: google.com
-#        port:
-#        username:
-#        password:
+    subscription:
+      resthook_enabled: true
+      websocket_enabled: false
+      email:
+        from: some@test.com
+        host: google.com
+        port: 587
+        username: me
+        password: pass
 #        auth:
 #        startTlsEnable:
 #        startTlsRequired:
@@ -144,10 +143,10 @@ hapi:
 ###   2: NORMALIZED_QUANTITY_SEARCH_SUPPORTED
 #    normalized_quantity_search_level: 2
 #elasticsearch:
-#  debug:
+debug:
 #    pretty_print_json_log: false
 #    refresh_after_write: false
-#  enabled: false
+  enabled: false
 #  password: SomePassword
 #  required_index_status: YELLOW
 #  rest_url: 'localhost:9200'
