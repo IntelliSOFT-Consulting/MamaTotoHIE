@@ -11,10 +11,18 @@ router.use(express.json());
 router.post('/', async (req, res) => {
     try {
         let data = req.body;
-        console.log(req.headers)
 
-        let patientId  = uuid();
+        let nationalId  = data.identification[0].number;
+        let patientId;
 
+        let _patient = (await FhirApi({url:`/Patient?identifier=${nationalId}`})).data;
+        if(Object.keys(_patient).indexOf('entry') > -1){
+            // patient with the id exists
+            patientId = _patient.entry[0].resource.id;
+            console.log(patientId);
+        }else{
+            patientId = uuid();
+        }
         let Patient = {
             resourceType:"Patient",
             id: patientId,
