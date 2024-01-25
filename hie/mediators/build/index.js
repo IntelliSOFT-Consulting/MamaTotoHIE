@@ -25,21 +25,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
-const path_1 = __importDefault(require("path"));
 dotenv.config(); // Load environment variables
 //Import routes 
-const main_1 = __importDefault(require("./routes/main"));
 const auth_1 = __importDefault(require("./routes/auth"));
-const patients_1 = __importDefault(require("./routes/patients"));
-const shr_1 = __importDefault(require("./routes/shr"));
+const beneficiary_1 = __importDefault(require("./routes/beneficiary"));
 const app = express_1.default();
 const PORT = 3000;
 app.use(cors_1.default());
-app.use('/', main_1.default);
+app.use((req, res, next) => {
+    try {
+        // Starts when a new request is received by the server
+        console.log(`${new Date().toUTCString()} : The Mediator has received ${req.method} request from ${req.hostname} on ${req.path}`);
+        next();
+    }
+    catch (error) {
+        // Starts when a new request is received by the server
+        res.json(error);
+        return;
+    }
+});
 app.use('/auth', auth_1.default);
-app.use('/patients', patients_1.default);
-app.use('/shr', shr_1.default);
-app.use('/files', express_1.default.static(`${path_1.default.join(__dirname, '../public/')}`));
+app.use('/beneficiary', beneficiary_1.default);
 app.listen(PORT, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
 });

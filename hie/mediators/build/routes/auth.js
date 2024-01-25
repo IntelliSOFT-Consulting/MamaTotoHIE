@@ -21,8 +21,8 @@ router.get("/token", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         let token = yield utils_1.getOpenHIMToken();
         yield utils_1.installChannels();
-        res.json({ status: "success", token });
         res.set(token);
+        res.json({ status: "success", token });
         return;
     }
     catch (error) {
@@ -38,6 +38,12 @@ router.post("/client", (req, res) => __awaiter(void 0, void 0, void 0, function*
         yield utils_1.getOpenHIMToken();
         let { name, password } = req.body;
         let response = yield utils_1.createClient(name, password);
+        if (response === "Unauthorized" || response.indexOf("error") > -1) {
+            res.statusCode = 401;
+            res.json({ status: "error", error: response });
+            return;
+        }
+        res.statusCode = 201;
         res.json({ status: "success", response });
         return;
     }
