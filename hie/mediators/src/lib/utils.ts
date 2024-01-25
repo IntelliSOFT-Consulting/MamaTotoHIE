@@ -1,17 +1,17 @@
 import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
+import carepayBeneficiary from '../config/beneficiaryMediator.json'
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
 
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
-import { uuid } from 'uuidv4';
-import { exists } from 'fs';
 
 // mediators to be registered
 const mediators = [
-    shrMediatorConfig
+    shrMediatorConfig,
+    carepayBeneficiary
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
@@ -30,8 +30,8 @@ const openhimConfig = {
 
 utils.authenticate(openhimConfig, (e: any) => {
     console.log(e ? e : "✅ OpenHIM authenticated successfully");
-    importMediators();
-    installChannels();
+    // importMediators();
+    // installChannels();
 })
 
 export const importMediators = () => {
@@ -304,16 +304,6 @@ export const parseMedication = async (data: any) => {
 export const parseFHIRBundle = async (params: any) => {
     try {
         // return {}
-    } catch (error) {
-        return null
-    }
-
-}
-
-
-export const generateFHIRBundle = async (params: any) => {
-    try {
-
     } catch (error) {
         return null
     }
