@@ -30,8 +30,8 @@ const openhimConfig = {
 
 utils.authenticate(openhimConfig, (e: any) => {
     console.log(e ? e : "✅ OpenHIM authenticated successfully");
-    // importMediators();
-    // installChannels();
+    importMediators();
+    installChannels();
 })
 
 export const importMediators = () => {
