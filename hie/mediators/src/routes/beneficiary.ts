@@ -287,7 +287,6 @@ router.post('/carepay', async (req, res) => {
             headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
         }))).json();
 
-        console.log(carepayResponse);
         if(carepayResponse.status === 400){
           res.statusCode = 400;
           res.json(carepayResponse);
@@ -321,7 +320,6 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       let {id} = req.params;
       let data = await (await FhirApi({url: `/Patient/${id}`})).data
       let tag = data.meta?.tag ?? null;
-      console.log(tag);
       if (tag){
         res.statusCode = 200;
         res.json(data);
