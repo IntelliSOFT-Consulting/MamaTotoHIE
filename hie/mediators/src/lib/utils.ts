@@ -105,33 +105,6 @@ export const FhirApi = async (params: any) => {
     }
 }
 
-
-export const parseIdentifiers = async (patientId: string) => {
-    let patient: any = (await FhirApi({ url: `/Patient?identifier=${patientId}`, })).data
-    if (!(patient?.total > 0 || patient?.entry.length > 0)) {
-        return null;
-    }
-    let identifiers = patient.entry[0].resource.identifier;
-    return identifiers.map((id: any) => {
-        return {
-            [id.id]: id
-        }
-    })
-}
-
-export const sendRequest = async () => {
-    let headers = await getOpenHIMToken();
-    [shrMediatorConfig.urn].map(async (urn: string) => {
-        let response = await (await fetch(`${openhimApiUrl}/patients`, {
-            headers: { ...headers, "Content-Type": "application/json" }, method: 'POST', body: JSON.stringify({ a: "y" }), agent: new Agent({
-                rejectUnauthorized: false
-            })
-        })).text();
-        console.log(response);
-    });
-}
-
-
 export const createClient = async (name: string, password: string) => {
     let headers = await getOpenHIMToken();
     const clientPassword = password
@@ -154,8 +127,6 @@ export const createClient = async (name: string, password: string) => {
 }
 
 
-// export let apiHost = process.env.FHIR_BASE_URL
-
 
 const genClientPassword = async (password: string) => {
     return new Promise((resolve) => {
@@ -173,139 +144,35 @@ const genClientPassword = async (password: string) => {
 }
 
 
-export const getPatientSummary = async (crossBorderId: string) => {
+export let createFHIRSubscription = async () => {
     try {
-        let patient = await getPatientByCrossBorderId(crossBorderId)
-        console.log(patient);
-        let ips = (await FhirApi({ url: `/Patient/${patient.id}/$summary` })).data;
-        return ips;
-    } catch (error) {
-        console.log(error);
-        return null
-    }
-}
-
-
-const letterToNumber = (str: any = '') => {
-    let result = '';
-
-    for (let i = 0; i < str.length; i++) {
-        const char = str[i].toUpperCase();
-
-        if (char >= 'A' && char <= 'Z') {
-            const number = (char.charCodeAt(0) - 64).toString().padStart(2, '0');
-            result += number;
+        let FHIR_SUBSCRIPTION_ID = process.env['FHIR_SUBSCRIPTION_ID'];
+        let FHIR_SUBSCRIPTION_CALLBACK_URL = process.env['FHIR_SUBSCRIPTION_CALLBACK_URL'];
+        let response = await (await FhirApi({ url:`/Subscription/${FHIR_SUBSCRIPTION_ID}`,
+            method: "PUT", data: JSON.stringify({
+                resourceType: 'Subscription',
+                id: FHIR_SUBSCRIPTION_ID,
+                status: "active",
+                criteria: 'Patient?',
+                channel: {
+                    type: 'rest-hook',
+                    endpoint: FHIR_SUBSCRIPTION_CALLBACK_URL,
+                    payload: 'application/json'
+                } 
+            })
+        })).data
+        if(response.resourceType != "OperationOutcome"){
+            console.log(`FHIR Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
+            return;
         }
-    }
-    return String(result) || "X";
-}
-
-const mapStringToNumber = (str: string) => {
-    let number = ''
-    for (let x of str.slice(0, 3)) {
-        number += letterToNumber(x)
-    }
-    return number;
-}
-
-
-export const generateCrossBorderId = async (patient: any) => {
-    let month = new Date().getMonth() + 1;
-    let dob = new Date(patient.birthDate);
-    let gender = patient?.gender || null
-
-    let middleNameCode = mapStringToNumber(patient.name[0]?.given[1] || "X")
-    let givenNameCode = mapStringToNumber(patient.name[0]?.given[0] || "X")
-    let familyNameCode = mapStringToNumber(patient.name[0]?.family)
-    let countryCode = "X"
-    let genderCode = gender === 'male' ? "M" : gender === 'female' ? "F" : "X"
-    let monthCode = (dob.getMonth() + 1) || "X"
-    let year = dob.getFullYear() || "X"
-
-    let id = `${countryCode}-0${monthCode}${year}-${genderCode}-${givenNameCode}-${familyNameCode}-${middleNameCode}`;
-
-    // check if id exists
-    // let response = (await FhirApi({ url: `/Patient?identifier=${id}` })).data
-    // if(response?.entry){
-    //     return id
-    // }
-    return id;
-}
-
-export const getPatientByCrossBorderId = async (crossBorderId: string) => {
-    try {
-        let patient = (await FhirApi({ url: `/Patient?identifier=${crossBorderId}` })).data;
-        if (patient?.total > 0 || patient?.entry?.length > 0) {
-            patient = patient.entry[0].resource;
-            return patient;
-        }
-        return null;
+        console.log(`Failed to create FHIR Subscription: \n${response}`);
     } catch (error) {
         console.log(error);
-        return null;
-    }
-}
-
-
-export const parseObservationResource = async (data: any) => {
-    try {
-        let codes = data
-        // { observation, value }
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-export const Observation = (patientId: string, codes: Array<any>, encounterId: string) => {
-    try {
-        return {
-            resourceType: "Observation",
-            code: { coding: codes },
-            subject: { reference: `Patient/${patientId}` },
-            effectiveDateTime: new Date().toISOString(),
-            issued: new Date().toISOString(),
-            // meta: {
-            //     "profile": [
-            //         "http://fhir.org/guides/who/core/StructureDefinition/who-observation",
-            //     ]
-            // },
-        }
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-
-}
-
-export const parseEncounterResource = async (data: any) => {
-    try {
-
-    } catch (error) {
-        console.log(error);
-        return null;
     }
 }
 
 
 
+createFHIRSubscription();
 
-
-export const parseMedication = async (data: any) => {
-    try {
-
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-
-export const parseFHIRBundle = async (params: any) => {
-    try {
-        // return {}
-    } catch (error) {
-        return null
-    }
-
-}
+createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '')

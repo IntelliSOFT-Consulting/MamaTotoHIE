@@ -27,10 +27,6 @@ app.use((req, res, next) => {
   }
 });
 
-
-
-
-
 app.use('/auth', Auth)
 app.use('/beneficiary', Beneficiary)
 

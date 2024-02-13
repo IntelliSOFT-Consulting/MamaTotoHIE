@@ -3,7 +3,7 @@ networks:
     openhim:
     hapi-fhir:
     mediators:
-
+    cloudbuild:
 
 services:
     mongo:
@@ -34,6 +34,7 @@ services:
         restart: unless-stopped
         networks:
             - hapi-fhir
+            - openhim
         ports:
             - "8081:8080"
         depends_on:
@@ -77,8 +78,8 @@ services:
         restart: on-failure
         networks:
             - openhim
-        # ports:
-            # - "9000:80"
+        ports:
+            - "9000:80"
         healthcheck:
             test: "curl -sS http://openhim-console || exit 1"
             interval: 30s

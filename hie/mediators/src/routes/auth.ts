@@ -1,5 +1,5 @@
 import express, { Request, response, Response } from "express";
-import { createClient, getOpenHIMToken, installChannels, sendRequest } from "../lib/utils";
+import { createClient, getOpenHIMToken, installChannels } from "../lib/utils";
 
 
 const router = express.Router();
@@ -43,22 +43,6 @@ router.post("/client", async (req: Request, res: Response) => {
         console.log(error);
         res.statusCode = 401;
         res.json({ error: "incorrect email or password", status: "error" });
-        return;
-    }
-});
-
-// Login
-router.get("/install", async (req: Request, res: Response) => {
-    try {
-        let token = await getOpenHIMToken();
-        await sendRequest()
-        res.json({ status: "success", token });
-        return;
-    }
-    catch (error) {
-        console.log(error);
-        res.statusCode = 401;
-        res.json({ error: "incorrect email or password" });
         return;
     }
 });
