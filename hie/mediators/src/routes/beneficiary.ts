@@ -258,7 +258,7 @@ router.post('/', async (req, res) => {
 router.post('/carepay', async (req, res) => {
     try {
         let data = req.body;
-        console.log(data);
+        // console.log("CarePay Request Payload", data);
         if(data.resourceType != "Patient"){
           res.statusCode = 200;
           res.json({
@@ -293,7 +293,10 @@ router.post('/carepay', async (req, res) => {
           return;
         }
         res.statusCode = 200;
-        res.json(carepayResponse);
+        data['identifier'] = [];
+        data.identifier.push({system: "http://carepay.com", value: carepayResponse.membershipNumber})
+        data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
+        res.json(data);
         return;
     } catch (error) {
         console.error(error);
@@ -320,11 +323,15 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       let {id} = req.params;
       let data = await (await FhirApi({url: `/Patient/${id}`})).data
       let tag = data.meta?.tag ?? null;
-      if (tag){
+      let identifiers = data?.identifier;
+      // console.log(tag, identifiers);
+      if (tag || identifiers){
         res.statusCode = 200;
+        // console.log(data);
         res.json(data);
         return;
       }
+      console.log(data);
       let CAREPAY_MEDIATOR_ENDPOINT = process.env['CAREPAY_MEDIATOR_ENDPOINT'] ?? "";
       let OPENHIM_CLIENT_ID = process.env['OPENHIM_CLIENT_ID'] ?? "";
       let OPENHIM_CLIENT_PASSWORD = process.env['OPENHIM_CLIENT_PASSWORD'] ?? "";
