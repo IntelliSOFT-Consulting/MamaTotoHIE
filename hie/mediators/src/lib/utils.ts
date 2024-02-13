@@ -175,4 +175,4 @@ export let createFHIRSubscription = async () => {
 
 createFHIRSubscription();
 
-createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '')
+createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '');
