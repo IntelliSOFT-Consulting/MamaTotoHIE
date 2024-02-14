@@ -22,8 +22,8 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
         return {
                 "title": gender == "MALE" ? "MR" : "MRS" ,
                 "firstName": patient.name[0].given[0] ?? " ",
-                "middleName": patient.name[0].given[1] ?? " ",
-                "lastName": patient.name[0].family ?? " ",
+                ...(patient.name[0].given[1] ? true: false) && {"middleName": patient.name[0].given[1]},
+                ...(patient.name[0].family ? true: false) && {"lastName": patient.name[0].family},
                 "gender": gender,
                 "dateOfBirth": patient.birthDate,
                 // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
