@@ -281,9 +281,11 @@ router.post('/carepay', async (req, res) => {
         }))).json();
         let cpEndpointUrl = `${CAREPAY_BASE_URL}/beneficiary/policies/${CAREPAY_POLICY_ID}/enrollments/beneficiary`
         let accessToken = authToken['accessToken'];
+        let carepayBeneficiaryPayload = await fhirPatientToCarepayBeneficiary(data);
+        // console.log(carepayBeneficiaryPayload);
         let carepayResponse = await(await (fetch(cpEndpointUrl, {
             method: "POST",
-            body:JSON.stringify(await fhirPatientToCarepayBeneficiary(data)),
+            body:JSON.stringify(carepayBeneficiaryPayload),
             headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
         }))).json();
 
