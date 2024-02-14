@@ -16,7 +16,8 @@ function generateRandomString(length:number) {
 export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
     try {
         let gender = String(patient.gender).toUpperCase();
-        let _date = String(patient.birthDate).split("-")
+        let _date = String(patient.birthDate).split("-");
+        console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
 
         return {
                 "title": patient.gender == "MALE" ? "MR" : "MRS" ,
@@ -24,7 +25,8 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                 "middleName": patient.name[0].family ?? " ",
                 "lastName": patient.name[0].given[1] ?? " ",
                 "gender": gender,
-                "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
+                "dateOfBirth": patient.birthDate,
+                // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
                 "maritalStatus": "SINGLE",
                 "nationality": "string",
                 "identification": [
@@ -46,7 +48,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                   "salary": "string",
                   "commission": true
                 },
-                "email": `${patient.name[0].given[0] ?? " "}@.com`,"residentialCountryCode": "string",
+                "email": `${patient.name[0].given[0] ?? " "}@gmail.com`,"residentialCountryCode": "string",
                 "residentialCountyCode": "string",
                 "residentialLocationCode": "string",
                 "height": -1.7976931348623157e+308,

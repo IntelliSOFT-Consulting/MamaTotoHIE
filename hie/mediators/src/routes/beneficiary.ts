@@ -289,11 +289,22 @@ router.post('/carepay', async (req, res) => {
 
         if(carepayResponse.status === 400){
           res.statusCode = 400;
-          res.json(carepayResponse);
+          res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `Failed to post beneficiary- ${JSON.stringify(carepayResponse)}`
+                }
+            }]
+          });
           return;
         }
         res.statusCode = 200;
         data['identifier'] = [];
+        console.log(carepayResponse);
         data.identifier.push({system: "http://carepay.com", value: carepayResponse.membershipNumber})
         data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
         res.json(data);
@@ -327,11 +338,10 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       // console.log(tag, identifiers);
       if (tag || identifiers){
         res.statusCode = 200;
-        // console.log(data);
+        // console.log("found: ", tag, identifiers);
         res.json(data);
         return;
       }
-      console.log(data);
       let CAREPAY_MEDIATOR_ENDPOINT = process.env['CAREPAY_MEDIATOR_ENDPOINT'] ?? "";
       let OPENHIM_CLIENT_ID = process.env['OPENHIM_CLIENT_ID'] ?? "";
       let OPENHIM_CLIENT_PASSWORD = process.env['OPENHIM_CLIENT_PASSWORD'] ?? "";
@@ -343,7 +353,17 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       })).json()
       if(response.code >= 400){
         res.statusCode = response.code;
-        res.json(response);
+        res.json({
+          "resourceType": "OperationOutcome",
+          "id": "exception",
+          "issue": [{
+              "severity": "error",
+              "code": "exception",
+              "details": {
+                  "text": `Failed to post beneficiary- ${JSON.stringify(response)}`
+              }
+          }]
+        });
         return;
       }
       res.statusCode = 200;
