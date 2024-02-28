@@ -305,7 +305,7 @@ router.post('/carepay', async (req, res) => {
           return;
         }
         res.statusCode = 200;
-        data['identifier'] = [];
+        // data['identifier'] = [];
         console.log(carepayResponse);
         data.identifier.push({type: {coding: [{system: "http://carepay.com", code: "CAREPAY-MEMBER-NUMBER"}]}, value: carepayResponse.membershipNumber})
         data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
