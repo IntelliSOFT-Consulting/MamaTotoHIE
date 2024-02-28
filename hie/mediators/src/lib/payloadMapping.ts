@@ -1,6 +1,22 @@
 
 let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
 
+
+export const processIdentifiers = async (identifiers: any) => {
+  try {
+    let ids:any = {};
+    for(let id of identifiers){
+      let idType = id?.type?.coding[0].code;
+      let idSystem = id?.type?.coding[0].system;
+      // ids[`${id?.type?.}`]
+      ids[idType] = id?.value;
+    }
+    return ids;
+  } catch (error) {
+    return {}
+  }
+}
+
 function generateRandomString(length:number) {
   let result = '';
   const characters = '0123456789';

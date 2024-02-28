@@ -2,7 +2,7 @@ import express from 'express';
 import { FhirApi} from '../lib/utils';
 import { v4 as uuid } from 'uuid';
 import fetch from 'node-fetch';
-import { fhirPatientToCarepayBeneficiary } from '../lib/payloadMapping';
+import { fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
 
 let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
 let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
@@ -307,7 +307,7 @@ router.post('/carepay', async (req, res) => {
         res.statusCode = 200;
         data['identifier'] = [];
         console.log(carepayResponse);
-        data.identifier.push({system: "http://carepay.com", value: carepayResponse.membershipNumber})
+        data.identifier.push({type: {coding: [{system: "http://carepay.com", code: "CAREPAY-MEMBER-NUMBER"}]}, value: carepayResponse.membershipNumber})
         data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
         res.json(data);
         return;
@@ -337,8 +337,11 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       let data = await (await FhirApi({url: `/Patient/${id}`})).data
       let tag = data.meta?.tag ?? null;
       let identifiers = data?.identifier;
+      let parseIds  = await processIdentifiers(identifiers);
+      console.log(parseIds);
+
       // console.log(tag, identifiers);
-      if (tag || identifiers){
+      if (tag || Object.keys(parseIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1){
         res.statusCode = 200;
         // console.log("found: ", tag, identifiers);
         res.json(data);
