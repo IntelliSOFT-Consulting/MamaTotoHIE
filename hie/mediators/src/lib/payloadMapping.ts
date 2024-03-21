@@ -1,5 +1,7 @@
 
 let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
+let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
+
 
 
 export const processIdentifiers = async (identifiers: any) => {
@@ -70,7 +72,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                 "height": -1.7976931348623157e+308,
                 "weight": -1.7976931348623157e+308,
                 "bmi": -1.7976931348623157e+308,
-                "categoryId": "930f15cc-9f26-4d07-8ff4-3f39b3fe0b3b",
+                "categoryId": CAREPAY_CATEGORY_ID,
                 "policyId": `${CAREPAY_POLICY_ID}`,
                 "insuranceMemberId": "string",
                 "familyIdentifier": "string",
