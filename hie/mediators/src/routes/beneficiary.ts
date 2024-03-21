@@ -279,7 +279,7 @@ router.post('/carepay', async (req, res) => {
             method:"POST", body: JSON.stringify({"username":CAREPAY_USERNAME, "password":CAREPAY_PASSWORD}),
             headers:{"Content-Type":"application/json"}
         }))).json();
-        console.log(`authtoken: ${JSON.stringify(authToken)}`)
+        // console.log(`authtoken: ${JSON.stringify(authToken)}`)
         let cpEndpointUrl = `${CAREPAY_BASE_URL}/beneficiary/policies/${CAREPAY_POLICY_ID}/enrollments/beneficiary`
         let accessToken = authToken['accessToken'];
         let carepayBeneficiaryPayload = await fhirPatientToCarepayBeneficiary(data);
@@ -290,7 +290,7 @@ router.post('/carepay', async (req, res) => {
             headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
         }))).json();
 
-        console.log(`Res: ${JSON.stringify(carepayResponse)}`)
+        // console.log(`Res: ${JSON.stringify(carepayResponse)}`)
 
         if(carepayResponse.status === 400){
           res.statusCode = 400;
