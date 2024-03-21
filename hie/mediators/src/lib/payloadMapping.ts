@@ -85,8 +85,8 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                   }
                 ],
                 "visaPlaceOfIssueCode": "string",
-                "startDate": "2024-01-01T14:15:22Z",
-                "endDate": "2024-12-31T14:15:22Z",
+                "startDate": new Date().toISOString(),
+                // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
                 "medicalApplicationForm": {
                   "mafConditions": [
                     {
