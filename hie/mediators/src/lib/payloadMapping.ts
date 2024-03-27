@@ -35,14 +35,16 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
     try {
         let gender = String(patient.gender).toUpperCase();
         let _date = String(patient.birthDate).split("-");
-        console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
+        // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
         let n:any = {}
 
         let phoneNumbers = patient.telecom;
         phoneNumbers.map( (numb:any) => {
-            n[numb.use] = numb.value;
+          if (Object.keys(numb).indexOf('value') > -1){
+              n[numb.system] = numb.value;
+          }
         })
-        console.log(n);
+        // console.log(n);
 
 
         return {
