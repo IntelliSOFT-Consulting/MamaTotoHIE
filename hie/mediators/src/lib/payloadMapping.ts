@@ -36,6 +36,14 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
         let gender = String(patient.gender).toUpperCase();
         let _date = String(patient.birthDate).split("-");
         console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
+        let n:any = {}
+
+        let phoneNumbers = patient.telecom;
+        phoneNumbers.map( (numb:any) => {
+            n[numb.use] = numb.value;
+        })
+        console.log(n);
+
 
         return {
                 "title": gender == "MALE" ? "MR" : "MRS" ,
@@ -77,6 +85,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                 "insuranceMemberId": "string",
                 "familyIdentifier": "string",
                 "relationship": "PRIMARY",
+                "phoneNumber": n?.phone ?? n?.mobile,
                 "dateOfEnrollment": "2014-02-07",
                 "document": [
                   {
