@@ -340,11 +340,11 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       let data = await (await FhirApi({url: `/Patient/${id}`})).data
       let tag = data.meta?.tag ?? null;
       let identifiers = data?.identifier;
-      let parseIds  = await processIdentifiers(identifiers);
-      console.log(parseIds);
+      let parsedIds  = await processIdentifiers(identifiers);
+      // console.log(parsedIds);
 
       // console.log(tag, identifiers);
-      if (tag || Object.keys(parseIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1){
+      if (tag || Object.keys(parsedIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1){
         res.statusCode = 200;
         // console.log("found: ", tag, identifiers);
         res.json(data);
