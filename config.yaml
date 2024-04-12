@@ -1,5 +1,5 @@
 projectName: MamaToto-HIE
-image: jembi/platform
+image: menyagah27/openhim:v1
 logPath: /tmp/logs
 
 packages:
