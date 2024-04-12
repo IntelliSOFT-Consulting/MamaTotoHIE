@@ -1,0 +1,18 @@
+projectName: MamaToto-HIE
+image: jembi/platform
+logPath: /tmp/logs
+
+packages:
+  - interoperability-layer-openhim
+
+customPackages:
+  - id: <<custom-package-id>>
+    path: <<local-path-or-github-url>>
+
+profiles:
+  - name: dev
+    packages:
+      - interoperability-layer-openhim
+
+    envFiles:
+      - dev.env
