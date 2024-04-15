@@ -1,0 +1,9 @@
+{
+  "id": "mamatoto-openhim-mediators",
+  "name": "MamaToto OpenHIM Mediators",
+  "description": "MamaToto OpenHIM Mediators",
+  "type": "use-case",
+  "version": "0.0.1",
+  "dependencies": [],
+  "environmentVariables": {}
+}

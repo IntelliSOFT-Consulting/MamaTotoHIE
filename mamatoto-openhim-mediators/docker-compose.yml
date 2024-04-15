@@ -1,0 +1,5 @@
+version: '3.9'
+
+services:
+  mamatoto-openhim-mediators:
+    image: intellisoftkenya/mamatoto-openhim-mediators
