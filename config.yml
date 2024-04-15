@@ -7,22 +7,22 @@ packages:
   - identity-access-manager-keycloak
 
 customPackages:
-  - id: mamatoto-fhir-datastore
-    path: fhir-datastore-hapi-fhir
+  - id: mamatoto-datastore-hapi-fhir
+    path: ./mamatoto-datastore-hapi-fhir
   
-  - id: mamatoto-openhim
-    path: interoperability-layer-openhim
+  - id: mamatoto-interoperability-layer-openhim
+    path: ./mamatoto-interoperability-layer-openhim
 
-  - id: mamatoto-mediators
-    path: hie
+  # - id: mamatoto-mediators
+  #   path: hie
 
 profiles:
   - name: mamatoto
     packages:
-      - interoperability-layer-openhim
+      - mamatoto-interoperability-layer-openhim
       - reverse-proxy-nginx
-      - fhir-datastore-hapi-fhir
-      - mamatoto-mediators
+      - mamatoto-datastore-hapi-fhir
+      # - mamatoto-mediators
       - identity-access-manager-keycloak
     envFiles:
       - .env
