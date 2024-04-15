@@ -13,8 +13,8 @@ customPackages:
   - id: mamatoto-interoperability-layer-openhim
     path: ./mamatoto-interoperability-layer-openhim
 
-  # - id: mamatoto-mediators
-  #   path: hie
+  - id: mamatoto-openhim-mediators
+    path: ./mamatoto-openhim-mediators
 
 profiles:
   - name: mamatoto
