@@ -2,4 +2,38 @@ version: '3.9'
 
 services:
   mamatoto-openhim-mediators:
-    image: intellisoftkenya/mamatoto-openhim-mediators
+    image: intellisoftkenya/mamatoto-openhim-mediators:latest
+    networks:
+      kafka:
+      hapi-fhir:
+      reverse-proxy:
+      keycloak:
+      public:
+      default:
+      prometheus:
+    deploy:
+      replicas: ${MEDIATOR_INSTANCES}
+      placement:
+        max_replicas_per_node: 1
+    
+
+networks:
+  kafka:
+    name: kafka_public
+    external: true
+  hapi-fhir:
+    name: hapi-fhir_public
+    external: true
+  reverse-proxy:
+    name: reverse-proxy_public
+    external: true
+  keycloak:
+    name: keycloak_public
+    external: true
+  public:
+    name: openhim_public
+    external: true
+  prometheus:
+    name: prometheus_public
+    external: true
+  default:

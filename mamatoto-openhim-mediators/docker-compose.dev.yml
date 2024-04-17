@@ -3,6 +3,6 @@ version: '3.9'
 services:
   mamatoto-openhim-mediators:
     ports:
-      - target: 8080
+      - target: 3000
         published: 8081
         mode: host

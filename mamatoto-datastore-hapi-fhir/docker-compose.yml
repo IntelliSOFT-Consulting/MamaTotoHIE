@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   hapi-fhir:
-    image: intellisoftkenya/hapi-fhir-mamatoto:latest
+    image: intellisoftkenya/hapi-fhir:latest
     networks:
       mpi:
       public:
