@@ -19,10 +19,10 @@ customPackages:
 profiles:
   - name: mamatoto
     packages:
-      - mamatoto-interoperability-layer-openhim
+      # - mamatoto-interoperability-layer-openhim
       # - reverse-proxy-nginx
-      # - mamatoto-datastore-hapi-fhir
-      # - mamatoto-openhim-mediators
+      - mamatoto-datastore-hapi-fhir
+      - mamatoto-openhim-mediators
       # - identity-access-manager-keycloak
     envFiles:
       - .env
