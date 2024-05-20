@@ -1,0 +1,26 @@
+{
+  "id": "mamatoto-openhim-mediators",
+  "name": "MamaToto OpenHIM Mediators",
+  "description": "MamaToto OpenHIM Mediators",
+  "type": "infrastructure",
+  "version": "0.0.1",
+  "dependencies": [],
+  "environmentVariables": {
+    "MEDIATOR_INSTANCES": 1,
+    "OPENHIM_API_URL": "https://openhim-core:8080",
+    "OPENHIM_USERNAME": "root@openhim.org",
+    "OPENHIM_PASSWORD": "your-password",
+    "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+    "CAREPAY_MEDIATOR_ENDPOINT": "http://openhim-core:5001/beneficiary/carepay",
+    "OPENHIM_CLIENT_ID": "hapi-fhir",
+    "OPENHIM_CLIENT_PASSWORD": "hapi-fhir-client-password",
+    "FHIR_BASE_URL": "http://hapi-fhir-jpa:8080/fhir",
+    "CAREPAY_BASE_URL": "https://api.ae-test.carepay.dev/api/v3",
+    "CAREPAY_USERNAME": "",
+    "CAREPAY_PASSWORD": "",
+    "CAREPAY_POLICY_ID": "",
+    "CAREPAY_CATEGORY_ID": "",
+    "FHIR_SUBSCRIPTION_ID": "mamatoto-patient-listener",
+    "FHIR_SUBSCRIPTION_CALLBACK_URL": "http://mediators:3000/beneficiary/notifications"
+  }
+}

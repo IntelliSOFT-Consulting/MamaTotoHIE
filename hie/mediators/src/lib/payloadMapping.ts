@@ -4,13 +4,15 @@ let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
 
 
 
+const getCurrentDate = () => new Date().toISOString().slice(0, 10);
+
+
 export const processIdentifiers = async (identifiers: any) => {
   try {
     let ids:any = {};
     for(let id of identifiers){
       let idType = id?.type?.coding[0].code;
       let idSystem = id?.type?.coding[0].system;
-      // ids[`${id?.type?.}`]
       ids[idType] = id?.value;
     }
     return ids;
@@ -56,7 +58,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                 "dateOfBirth": patient.birthDate,
                 // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
                 "maritalStatus": "SINGLE",
-                "nationality": "string",
+                "nationality": "KE",
                 "identification": [
                   {
                     "type": "NATIONAL_ID",
@@ -64,38 +66,16 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                   }
                 ],
                 "acceptTermsAndCondition": true,
-                "beneficiaryType": "string",
                 "occupation": "EMPLOYED",
-                "employment": {
-                  "employeeCode": "string",
-                  "workCountryCode": "string",
-                  "workCountyCode": "string",
-                  "workLocationCode": "string",
-                  "department": "string",
-                  "profession": "string",
-                  "salary": "string",
-                  "commission": true
-                },
                 "email": `${patient.name[0].given[0] ?? " "}@gmail.com`,"residentialCountryCode": "string",
-                "residentialCountyCode": "string",
-                "residentialLocationCode": "string",
                 "height": -1.7976931348623157e+308,
                 "weight": -1.7976931348623157e+308,
                 "bmi": -1.7976931348623157e+308,
                 "categoryId": CAREPAY_CATEGORY_ID,
                 "policyId": `${CAREPAY_POLICY_ID}`,
-                "insuranceMemberId": "string",
-                "familyIdentifier": "string",
                 "relationship": "PRIMARY",
                 "phoneNumber": n?.phone ?? n?.mobile,
                 "dateOfEnrollment": "2014-02-07",
-                "document": [
-                  {
-                    "documentType": "string",
-                    "documentLocation": "string"
-                  }
-                ],
-                "visaPlaceOfIssueCode": "string",
                 "startDate": new Date().toISOString(),
                 // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
                 "medicalApplicationForm": {
@@ -113,7 +93,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                       ]
                     }
                   ],
-                  "signatureDate": "2023-10-10"
+                  "signatureDate": getCurrentDate()
                 }
               }
         }
