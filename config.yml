@@ -1,0 +1,30 @@
+projectName: MamaToto
+image: jembi/platform:latest
+logPath: /tmp/logs
+
+packages:
+  - reverse-proxy-nginx
+  - identity-access-manager-keycloak
+
+customPackages:
+  - id: mamatoto-datastore-hapi-fhir
+    path: ./mamatoto-datastore-hapi-fhir
+  
+  - id: mamatoto-interoperability-layer-openhim
+    path: ./mamatoto-interoperability-layer-openhim
+
+  - id: mamatoto-openhim-mediators
+    path: ./mamatoto-openhim-mediators
+
+profiles:
+  - name: mamatoto
+    packages:
+      - mamatoto-interoperability-layer-openhim
+      - reverse-proxy-nginx
+      - mamatoto-datastore-hapi-fhir
+      - mamatoto-openhim-mediators
+      - identity-access-manager-keycloak
+    envFiles:
+      - .env
+    dev: true
+    only: true

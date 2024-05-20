@@ -2,7 +2,7 @@ import express from 'express';
 import { FhirApi} from '../lib/utils';
 import { v4 as uuid } from 'uuid';
 import fetch from 'node-fetch';
-import { fhirPatientToCarepayBeneficiary } from '../lib/payloadMapping';
+import { fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
 
 let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
 let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
@@ -258,7 +258,7 @@ router.post('/', async (req, res) => {
 router.post('/carepay', async (req, res) => {
     try {
         let data = req.body;
-        console.log(data);
+        // console.log("CarePay Request Payload", data);
         if(data.resourceType != "Patient"){
           res.statusCode = 200;
           res.json({
@@ -279,21 +279,45 @@ router.post('/carepay', async (req, res) => {
             method:"POST", body: JSON.stringify({"username":CAREPAY_USERNAME, "password":CAREPAY_PASSWORD}),
             headers:{"Content-Type":"application/json"}
         }))).json();
+        // console.log(`authtoken: ${JSON.stringify(authToken)}`)
         let cpEndpointUrl = `${CAREPAY_BASE_URL}/beneficiary/policies/${CAREPAY_POLICY_ID}/enrollments/beneficiary`
         let accessToken = authToken['accessToken'];
+        let carepayBeneficiaryPayload = await fhirPatientToCarepayBeneficiary(data);
+        // console.log(carepayBeneficiaryPayload);
         let carepayResponse = await(await (fetch(cpEndpointUrl, {
             method: "POST",
-            body:JSON.stringify(await fhirPatientToCarepayBeneficiary(data)),
+            body:JSON.stringify(carepayBeneficiaryPayload),
             headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
         }))).json();
 
+        // console.log(`Res: ${JSON.stringify(carepayResponse)}`)
+
         if(carepayResponse.status === 400){
           res.statusCode = 400;
-          res.json(carepayResponse);
+          res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `Failed to post beneficiary- ${JSON.stringify(carepayResponse)}`
+                }
+            }]
+          });
           return;
         }
         res.statusCode = 200;
-        res.json(carepayResponse);
+        // data['identifier'] = [];
+        console.log(carepayResponse);
+        let carepayFhirId = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-MEMBER-NUMBER"}]}, value: carepayResponse.membershipNumber} 
+        if(!data.identifier){
+          data.identifier = [carepayFhirId];
+        }else{
+          data.identifier.push(carepayFhirId);
+        }
+        data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
+        res.json(data);
         return;
     } catch (error) {
         console.error(error);
@@ -320,8 +344,14 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       let {id} = req.params;
       let data = await (await FhirApi({url: `/Patient/${id}`})).data
       let tag = data.meta?.tag ?? null;
-      if (tag){
+      let identifiers = data?.identifier;
+      let parsedIds  = await processIdentifiers(identifiers);
+      // console.log(parsedIds);
+
+      // console.log(tag, identifiers);
+      if (tag || Object.keys(parsedIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1){
         res.statusCode = 200;
+        // console.log("found: ", tag, identifiers);
         res.json(data);
         return;
       }
@@ -336,7 +366,17 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       })).json()
       if(response.code >= 400){
         res.statusCode = response.code;
-        res.json(response);
+        res.json({
+          "resourceType": "OperationOutcome",
+          "id": "exception",
+          "issue": [{
+              "severity": "error",
+              "code": "exception",
+              "details": {
+                  "text": `Failed to post beneficiary- ${JSON.stringify(response)}`
+              }
+          }]
+        });
         return;
       }
       res.statusCode = 200;
