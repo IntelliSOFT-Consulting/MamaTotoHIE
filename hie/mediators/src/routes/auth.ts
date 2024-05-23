@@ -1,23 +1,43 @@
 import express, { Request, response, Response } from "express";
 import { createClient, getOpenHIMToken, installChannels } from "../lib/utils";
+import { getKeycloakUserToken } from "../lib/keycloak";
 
 
 const router = express.Router();
 router.use(express.json());
 
+// // Login
+// router.get("/token", async (req: Request, res: Response) => {
+//     try {
+//         let token = await getOpenHIMToken();
+//         await installChannels()
+//         res.set(token);
+//         res.json({ status: "success", token });
+//         return;
+//     }
+//     catch (error) {
+//         console.log(error);
+//         res.statusCode = 401;
+//         res.json({ error: "incorrect email or password" });
+//         return;
+//     }
+// });
+
 // Login
-router.get("/token", async (req: Request, res: Response) => {
+router.post("/token", async (req: Request, res: Response) => {
     try {
-        let token = await getOpenHIMToken();
-        await installChannels()
-        res.set(token);
-        res.json({ status: "success", token });
+        
+        let { username, password } = req.body;
+        let response = await getKeycloakUserToken(username, password);
+        // console.log(response);
+        res.statusCode = Object.keys(response).indexOf('error') < 0 ? 200 : 401 ;
+        res.json({ ...response, status: Object.keys(response).indexOf('error') < 0  ? "success" : "error"  , });
         return;
     }
     catch (error) {
         console.log(error);
         res.statusCode = 401;
-        res.json({ error: "incorrect email or password" });
+        res.json({ error: "incorrect email or password", status: "error" });
         return;
     }
 });
