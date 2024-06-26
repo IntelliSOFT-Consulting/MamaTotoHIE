@@ -48,3 +48,5 @@ cron.schedule('*/2 * * * *', () => {
   // Add your task logic here
   fetchVisits();
 });
+
+fetchVisits();
