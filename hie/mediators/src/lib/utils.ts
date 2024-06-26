@@ -205,6 +205,8 @@ export let createEncounterSubscription = async () => {
 
 
 // these functions will be run anytime during runtime
+
+
 createFHIRPatientSubscription();
 createEncounterSubscription()
 createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '');

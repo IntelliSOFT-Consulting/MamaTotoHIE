@@ -2,11 +2,19 @@ import { FhirApi } from "./utils";
 import path from 'path';
 import fs from 'fs';
 
-let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
-let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
 let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
+let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
 let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
 let CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
+let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
+
+let CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
+let CAREPAY_DEV_CATEGORY_ID = process.env['CAREPAY_DEV_CATEGORY_ID'];
+let CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
+let CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
+let CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
+
+
 
 const LAST_RUN_FILE = path.join(__dirname, 'last_run.txt');
 
@@ -51,21 +59,22 @@ function generateRandomString(length:number) {
 
 
 
-export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
+export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string = "dev") => {
     try {
         let gender = String(patient.gender).toUpperCase();
         let _date = String(patient.birthDate).split("-");
         // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
-        let n:any = {}
+        let n:any = {};
 
         let phoneNumbers = patient.telecom;
-        phoneNumbers.map( (numb:any) => {
+        phoneNumbers.map( ( numb:any ) => {
           if (Object.keys(numb).indexOf('value') > -1){
               n[numb.system] = numb.value;
           }
         })
         // console.log(n);
 
+        let maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
 
         return {
                 "title": gender == "MALE" ? "MR" : "MRS" ,
@@ -75,44 +84,45 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                 "gender": gender,
                 "dateOfBirth": patient.birthDate,
                 // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
-                "maritalStatus": "SINGLE",
-                "nationality": "KE",
+                "maritalStatus": maritalStatus === "M"? "MARRIED" : "SINGLE",
+                // "nationality": "KE",
                 "identification": [
                   {
                     "type": "NATIONAL_ID",
-                    "number": `78452638982${generateRandomString(4)}`
+                    "number": `${patient?.identifier?.[0]?.value}`
                   }
                 ],
-                "acceptTermsAndCondition": true,
-                "occupation": "EMPLOYED",
-                "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,"residentialCountryCode": "string",
-                "height": -1.7976931348623157e+308,
-                "weight": -1.7976931348623157e+308,
-                "bmi": -1.7976931348623157e+308,
-                "categoryId": CAREPAY_CATEGORY_ID,
-                "policyId": `${CAREPAY_POLICY_ID}`,
+                // "acceptTermsAndCondition": true,
+                // "occupation": "EMPLOYED",
+                // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
+                "residentialCountryCode": "string",
+                // "height": 140,
+                // "weight": -1.7976931348623157e+308,
+                // "bmi": -1.7976931348623157e+308,
+                "categoryId": mode === "dev" ?  CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID,
+                "policyId": `${mode === "dev" ?  CAREPAY_DEV_POLICY_ID :CAREPAY_POLICY_ID}`,
                 "relationship": "PRIMARY",
                 "phoneNumber": n?.phone ?? n?.mobile,
-                "dateOfEnrollment": "2014-02-07",
+                // "dateOfEnrollment": "2014-02-07",
                 "startDate": new Date().toISOString(),
                 // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-                "medicalApplicationForm": {
-                  "mafConditions": [
-                    {
-                      "question": "Diabetes, gout, or any disorder of thyroid, or other glands.",
-                      "answer": true,
-                      "answerDetails": "My diabetes was diagnosed 2 years ago, and I have been under controlled treatment ever since.",
-                      "premiumImpact": 0.1,
-                      "medicalCodes": [
-                        {
-                          "codingStandard": "ICD-10-CM",
-                          "code": "A15-A19"
-                        }
-                      ]
-                    }
-                  ],
-                  "signatureDate": getCurrentDate()
-                }
+                // "medicalApplicationForm": {
+                //   "mafConditions": [
+                //     {
+                //       "question": "Diabetes, gout, or any disorder of thyroid, or other glands.",
+                //       "answer": true,
+                //       "answerDetails": "My diabetes was diagnosed 2 years ago, and I have been under controlled treatment ever since.",
+                //       "premiumImpact": 0.1,
+                //       "medicalCodes": [
+                //         {
+                //           "codingStandard": "ICD-10-CM",
+                //           "code": "A15-A19"
+                //         }
+                //       ]
+                //     }
+                //   ],
+                //   "signatureDate": getCurrentDate()
+                // }
               }
         }
     catch (error) {
@@ -132,7 +142,7 @@ export const buildEncounter = async (visit: any) => {
     let encounterPayload = {
       resourceType: "Encounter",
       id: visit.code,
-      status: status == "closed" ? "finished" : status,
+      status: (status === "closed") ? "finished" : status,
       subject: {
         reference: `Patient/${patient?.entry[0].resource?.id}`
       },

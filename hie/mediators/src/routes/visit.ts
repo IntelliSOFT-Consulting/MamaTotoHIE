@@ -1,14 +1,9 @@
 import express from 'express';
 import { FhirApi} from '../lib/utils';
-import { v4 as uuid } from 'uuid';
 import fetch from 'node-fetch';
-import { fetchVisits, fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
-import { url } from 'inspector';
 
 let SURVEY_FOLLOW_UP_URL = process.env['SURVEY_FOLLOW_UP_URL'] ?? '';
 let TURN_IO_ACCESS_TOKEN = process.env['TURN_IO_ACCESS_TOKEN'] ?? '';
-
-
 
 export const router = express.Router();
 
