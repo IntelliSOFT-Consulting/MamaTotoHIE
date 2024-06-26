@@ -4,10 +4,19 @@ import { v4 as uuid } from 'uuid';
 import fetch from 'node-fetch';
 import { fetchVisits, fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
 
-let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
-let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
-let CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
-let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
+
+let _TEST_PHONE_NUMBERS = process.env.TEST_PHONE_NUMBERS ?? "";
+let TEST_PHONE_NUMBERS = _TEST_PHONE_NUMBERS.split(",");
+
+let CAREPAY_BASE_URL = process.env['CAREPAY_PROD_BASE_URL'];
+let CAREPAY_USERNAME = process.env['CAREPAY_PROD_USERNAME'];
+let CAREPAY_PASSWORD = process.env['CAREPAY_PROD_PASSWORD'];
+let CAREPAY_POLICY_ID = process.env['CAREPAY_PROD_POLICY_ID'];
+
+let CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
+let CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
+let CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
+let CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
 
 
 export const router = express.Router();
@@ -273,14 +282,20 @@ router.post('/carepay', async (req, res) => {
           return;
         }
 
+        let mode = "prod"
         // send payload to carepay
-        let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
+        if (TEST_PHONE_NUMBERS.indexOf(`${data?.telecom?.[0]?.value ?? data?.telecom?.[1]?.value }`) > -1 ){
+          // dev environment
+          mode = "dev"
+        }
+        let cpLoginUrl = `${mode==="dev" ? CAREPAY_DEV_BASE_URL : CAREPAY_BASE_URL}/usermanagement/login`;
         let authToken = await(await (fetch(cpLoginUrl,{
-            method:"POST", body: JSON.stringify({"username":CAREPAY_USERNAME, "password":CAREPAY_PASSWORD}),
+            method:"POST", body: JSON.stringify({"username": mode==="dev" ? CAREPAY_DEV_USERNAME :CAREPAY_USERNAME, 
+              "password":mode==="dev" ? CAREPAY_DEV_PASSWORD: CAREPAY_PASSWORD}),
             headers:{"Content-Type":"application/json"}
         }))).json();
         // console.log(`authtoken: ${JSON.stringify(authToken)}`)
-        let cpEndpointUrl = `${CAREPAY_BASE_URL}/beneficiary/policies/${CAREPAY_POLICY_ID}/enrollments/beneficiary`
+        let cpEndpointUrl = `${mode==="dev" ? CAREPAY_DEV_BASE_URL: CAREPAY_BASE_URL}/beneficiary/policies/${mode==="dev" ? CAREPAY_DEV_POLICY_ID: CAREPAY_POLICY_ID}/enrollments/beneficiary`
         let accessToken = authToken['accessToken'];
         let carepayBeneficiaryPayload = await fhirPatientToCarepayBeneficiary(data);
         // console.log(carepayBeneficiaryPayload);
