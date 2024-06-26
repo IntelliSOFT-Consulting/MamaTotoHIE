@@ -89,12 +89,13 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
                 "identification": [
                   {
                     "type": "NATIONAL_ID",
-                    "number": `78452638982${generateRandomString(4)}`
+                    "number": `${patient?.identifier?.[0]?.value}`
                   }
                 ],
                 // "acceptTermsAndCondition": true,
                 // "occupation": "EMPLOYED",
-                "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,"residentialCountryCode": "string",
+                // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
+                "residentialCountryCode": "string",
                 // "height": 140,
                 // "weight": -1.7976931348623157e+308,
                 // "bmi": -1.7976931348623157e+308,
