@@ -14,7 +14,7 @@ export const getKeycloakUserToken = async (idNumber: string, password: string) =
               'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-              grant_type: 'password',
+              grant_type: 'client_credentials',
               client_id: KC_CLIENT_ID,
               client_secret: KC_CLIENT_SECRET,
               username: idNumber,

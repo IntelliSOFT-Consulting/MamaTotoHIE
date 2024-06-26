@@ -2,7 +2,7 @@ import express from 'express';
 import { FhirApi} from '../lib/utils';
 import { v4 as uuid } from 'uuid';
 import fetch from 'node-fetch';
-import { fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
+import { fetchVisits, fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
 
 let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
 let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
@@ -310,11 +310,12 @@ router.post('/carepay', async (req, res) => {
         res.statusCode = 200;
         // data['identifier'] = [];
         console.log(carepayResponse);
-        let carepayFhirId = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-MEMBER-NUMBER"}]}, value: carepayResponse.membershipNumber} 
+        let carepayFhirId = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-MEMBER-NUMBER", display: "Carepay Member Number"}]}, value: carepayResponse.membershipNumber}
+        let carepayPatientRef = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref"}]}, value: carepayResponse.id}
         if(!data.identifier){
-          data.identifier = [carepayFhirId];
+          data.identifier = [carepayFhirId, carepayPatientRef];
         }else{
-          data.identifier.push(carepayFhirId);
+          data.identifier.push(carepayFhirId, carepayPatientRef);
         }
         data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
         res.json(data);
@@ -349,7 +350,7 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       // console.log(parsedIds);
 
       // console.log(tag, identifiers);
-      if (tag || Object.keys(parsedIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1){
+      if (tag || Object.keys(parsedIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1 || Object.keys(parsedIds).indexOf('CAREPAY-PATIENT-REF') > -1){
         res.statusCode = 200;
         // console.log("found: ", tag, identifiers);
         res.json(data);
@@ -363,7 +364,7 @@ router.put('/notifications/Patient/:id', async (req, res) => {
         method: "POST",
         headers:{"Content-Type":"application/json",
         "Authorization": 'Basic ' + Buffer.from(OPENHIM_CLIENT_ID + ':' + OPENHIM_CLIENT_PASSWORD).toString('base64')}
-      })).json()
+      })).json();
       if(response.code >= 400){
         res.statusCode = response.code;
         res.json({

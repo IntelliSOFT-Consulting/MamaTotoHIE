@@ -1,6 +1,7 @@
 import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import carepayBeneficiary from '../config/beneficiaryMediator.json'
+import turnioMediatorConfig from '../config/turnioNotificationsMediator.json';
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
@@ -11,7 +12,8 @@ import { RequestInfo, RequestInit } from 'node-fetch';
 // mediators to be registered
 const mediators = [
     shrMediatorConfig,
-    carepayBeneficiary
+    carepayBeneficiary,
+    turnioMediatorConfig
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
@@ -144,9 +146,9 @@ const genClientPassword = async (password: string) => {
 }
 
 
-export let createFHIRSubscription = async () => {
+export let createFHIRPatientSubscription = async () => {
     try {
-        let FHIR_SUBSCRIPTION_ID = process.env['FHIR_SUBSCRIPTION_ID'];
+        let FHIR_SUBSCRIPTION_ID = process.env['FHIR_PATIENT_SUBSCRIPTION_ID'];
         let FHIR_SUBSCRIPTION_CALLBACK_URL = process.env['FHIR_SUBSCRIPTION_CALLBACK_URL'];
         let response = await (await FhirApi({ url:`/Subscription/${FHIR_SUBSCRIPTION_ID}`,
             method: "PUT", data: JSON.stringify({
@@ -162,7 +164,34 @@ export let createFHIRSubscription = async () => {
             })
         })).data
         if(response.resourceType != "OperationOutcome"){
-            console.log(`FHIR Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
+            console.log(`FHIR Patient Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
+            return;
+        }
+        console.log(`Failed to create FHIR Subscription: \n${response}`);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export let createEncounterSubscription = async () => {
+    try {
+        let FHIR_SUBSCRIPTION_ID = process.env['FHIR_ENCOUNTER_SUBSCRIPTION_ID'];
+        let FHIR_SUBSCRIPTION_CALLBACK_URL = process.env['FHIR_ENCOUNTER_CALLBACK_URL'];
+        let response = await (await FhirApi({ url:`/Subscription/${FHIR_SUBSCRIPTION_ID}`,
+            method: "PUT", data: JSON.stringify({
+                resourceType: 'Subscription',
+                id: FHIR_SUBSCRIPTION_ID,
+                status: "active",
+                criteria: 'Encounter?status=finished',
+                channel: {
+                    type: 'rest-hook',
+                    endpoint: FHIR_SUBSCRIPTION_CALLBACK_URL,
+                    payload: 'application/json'
+                } 
+            })
+        })).data
+        if(response.resourceType != "OperationOutcome"){
+            console.log(`FHIR Encounter Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
             return;
         }
         console.log(`Failed to create FHIR Subscription: \n${response}`);
@@ -173,6 +202,11 @@ export let createFHIRSubscription = async () => {
 
 
 
-createFHIRSubscription();
 
+
+// these functions will be run anytime during runtime
+createFHIRPatientSubscription();
+createEncounterSubscription()
 createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '');
+
+
