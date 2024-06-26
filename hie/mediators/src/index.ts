@@ -1,6 +1,7 @@
 import express from "express";
 import cors from 'cors'
 import * as dotenv from 'dotenv'
+import cron from 'node-cron';
 
 dotenv.config() // Load environment variables
 
@@ -8,6 +9,8 @@ dotenv.config() // Load environment variables
 
 import Auth from './routes/auth'
 import Beneficiary from './routes/beneficiary'
+import Visit from './routes/visit'
+import { fetchVisits } from "./lib/payloadMapping";
 
 
 const app = express();
@@ -29,10 +32,19 @@ app.use((req, res, next) => {
 
 app.use('/auth', Auth)
 app.use('/beneficiary', Beneficiary)
-
-
+app.use('/visit', Visit)
 
 
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
+});
+
+
+
+
+// Set up a cron job to run every three minutes
+cron.schedule('*/2 * * * *', () => {
+  console.log('Cron job running every two minutes');
+  // Add your task logic here
+  fetchVisits();
 });

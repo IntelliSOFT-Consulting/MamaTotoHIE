@@ -1,8 +1,26 @@
+import { FhirApi } from "./utils";
+import path from 'path';
+import fs from 'fs';
 
 let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
 let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
+let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
+let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
+let CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
 
+const LAST_RUN_FILE = path.join(__dirname, 'last_run.txt');
 
+// Function to read the last run timestamp from the file
+const readLastRunTimestamp = (): string | null => {
+  try {
+    if (fs.existsSync(LAST_RUN_FILE)) {
+      return fs.readFileSync(LAST_RUN_FILE, 'utf8');
+    }
+  } catch (error) {
+    console.error('Error reading last run timestamp:', error);
+  }
+  return null;
+};
 
 const getCurrentDate = () => new Date().toISOString().slice(0, 10);
 
@@ -67,7 +85,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
                 ],
                 "acceptTermsAndCondition": true,
                 "occupation": "EMPLOYED",
-                "email": `${patient.name[0].given[0] ?? " "}@gmail.com`,"residentialCountryCode": "string",
+                "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,"residentialCountryCode": "string",
                 "height": -1.7976931348623157e+308,
                 "weight": -1.7976931348623157e+308,
                 "bmi": -1.7976931348623157e+308,
@@ -102,3 +120,83 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any) => {
         return null;    
     }
 }
+
+export const buildEncounter = async (visit: any) => {
+  try {
+    let patient = await (await FhirApi({url: `/Patient?identifier=${visit.patientRef}`})).data;
+    // console.log(patient);
+    if(!(patient?.total) || !(patient?.entry)){
+      return {"error": "Patient not found"}
+    }
+    let status = String(visit.status).toLowerCase();
+    let encounterPayload = {
+      resourceType: "Encounter",
+      id: visit.code,
+      status: status == "closed" ? "finished" : status,
+      subject: {
+        reference: `Patient/${patient?.entry[0].resource?.id}`
+      },
+      period:{
+        start: visit.date,
+        end: visit.endDate
+      },
+      extension:[
+        {
+          url: "https://mamatoto.dev/StructureDefinition/patient-benefit",
+          valueReference:{
+            reference: `Coverage/${visit.benefitRef}`
+          }
+        },
+        {
+          url: "https://mamatoto.dev/StructureDefinition/patient-plan",
+          valueReference:{
+            reference: `Coverage/${visit.planRef}`
+          }
+        },
+      ],
+      serviceProvider: {
+        reference: `Organization/${visit.providerRef}`
+      }
+    }
+    let encounter = await FhirApi({url: `/Encounter/${encounterPayload.id}`, method: "PUT", data: JSON.stringify(encounterPayload)});
+    // console.log(encounter);
+    return encounter;
+  } catch (error) {
+    return {error};
+  }
+}
+const getLastYearISOString = () => {
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setFullYear(now.getFullYear() - 2);
+  return yesterday.toISOString();
+};
+
+export const fetchVisits = async (status: string | null = null) => {
+  try {
+
+    let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
+    // let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${readLastRunTimestamp() ?? getLastYearISOString()}`;
+     // send payload to carepay
+     let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
+     let authToken = await(await (fetch(cpLoginUrl,{
+         method:"POST", body: JSON.stringify({"username":CAREPAY_USERNAME, "password":CAREPAY_PASSWORD}),
+         headers:{"Content-Type":"application/json"}
+     }))).json();
+     let accessToken = authToken['accessToken'];
+    let visits =  await (await fetch(cpUrl, {
+      headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
+    })).json();
+    console.log(`Fetching visits ${visits.length} `);
+    for (let visit of visits){
+      let encounter = await buildEncounter(visit);
+      // console.log(encounter);
+      // return encounter
+    }
+    // Save the current timestamp to the file
+    // fs.writeFileSync(LAST_RUN_FILE, new Date().toISOString());
+  } catch (error) {
+    return {error} 
+  }
+}
+
