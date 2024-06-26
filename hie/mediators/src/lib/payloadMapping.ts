@@ -1,4 +1,6 @@
 import { FhirApi } from "./utils";
+import path from 'path';
+import fs from 'fs';
 
 let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
 let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
@@ -6,7 +8,19 @@ let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
 let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
 let CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
 
+const LAST_RUN_FILE = path.join(__dirname, 'last_run.txt');
 
+// Function to read the last run timestamp from the file
+const readLastRunTimestamp = (): string | null => {
+  try {
+    if (fs.existsSync(LAST_RUN_FILE)) {
+      return fs.readFileSync(LAST_RUN_FILE, 'utf8');
+    }
+  } catch (error) {
+    console.error('Error reading last run timestamp:', error);
+  }
+  return null;
+};
 
 const getCurrentDate = () => new Date().toISOString().slice(0, 10);
 
@@ -151,12 +165,18 @@ export const buildEncounter = async (visit: any) => {
     return {error};
   }
 }
-
+const getLastYearISOString = () => {
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setFullYear(now.getFullYear() - 2);
+  return yesterday.toISOString();
+};
 
 export const fetchVisits = async (status: string | null = null) => {
   try {
 
-    let cpUrl = `${CAREPAY_BASE_URL}/visit/visits`;
+    let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
+    // let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${readLastRunTimestamp() ?? getLastYearISOString()}`;
      // send payload to carepay
      let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
      let authToken = await(await (fetch(cpLoginUrl,{
@@ -173,6 +193,8 @@ export const fetchVisits = async (status: string | null = null) => {
       // console.log(encounter);
       // return encounter
     }
+    // Save the current timestamp to the file
+    // fs.writeFileSync(LAST_RUN_FILE, new Date().toISOString());
   } catch (error) {
     return {error} 
   }
