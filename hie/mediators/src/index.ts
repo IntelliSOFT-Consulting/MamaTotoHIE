@@ -10,6 +10,8 @@ dotenv.config() // Load environment variables
 import Auth from './routes/auth'
 import Beneficiary from './routes/beneficiary'
 import Visit from './routes/visit'
+import Callback from './routes/callback'
+
 import { fetchVisits } from "./lib/payloadMapping";
 
 
@@ -33,6 +35,7 @@ app.use((req, res, next) => {
 app.use('/auth', Auth)
 app.use('/beneficiary', Beneficiary)
 app.use('/visit', Visit)
+app.use('/callback', Callback)
 
 
 app.listen(PORT, () => {
