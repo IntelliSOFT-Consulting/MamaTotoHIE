@@ -6,12 +6,12 @@
     "defaultChannelConfig": [
         {
             "name": "Turn.io Notifications Channel",
-            "urlPattern": "/visit/turn",
+            "urlPattern": "/callback/turn",
             "routes": [
                 {
                     "name": "Turn.io Notifications Route",
                     "host": "mediators",
-                    "path": "/visit/turn",
+                    "path": "/callback/turn",
                     "port": "3000",
                     "primary": true,
                     "type": "http"
@@ -30,7 +30,7 @@
         {
             "name": "Turn.io Notifications Endpoint",
             "host": "mediators",
-            "path": "/visit/turn",
+            "path": "/callback/turn",
             "port": "3000",
             "primary": true,
             "type": "http"

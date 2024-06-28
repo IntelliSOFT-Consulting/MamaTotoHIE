@@ -2,17 +2,19 @@ import { FhirApi } from "./utils";
 import path from 'path';
 import fs from 'fs';
 
-let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
-let CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
-let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
-let CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
-let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
+const CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
+const CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
+const CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
+const CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
+const CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
 
-let CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
-let CAREPAY_DEV_CATEGORY_ID = process.env['CAREPAY_DEV_CATEGORY_ID'];
-let CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
-let CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
-let CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
+const CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
+const CAREPAY_DEV_CATEGORY_ID = process.env['CAREPAY_DEV_CATEGORY_ID'];
+const CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
+const CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
+const CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
+
+
 
 
 

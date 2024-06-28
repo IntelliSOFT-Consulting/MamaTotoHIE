@@ -1,22 +1,28 @@
 import express from 'express';
-import { FhirApi} from '../lib/utils';
+import { FhirApi, sendTurnNotification} from '../lib/utils';
 import { v4 as uuid } from 'uuid';
 import fetch from 'node-fetch';
 import { fetchVisits, fhirPatientToCarepayBeneficiary, processIdentifiers } from '../lib/payloadMapping';
 
 
-let _TEST_PHONE_NUMBERS = process.env.TEST_PHONE_NUMBERS ?? "";
-let TEST_PHONE_NUMBERS = _TEST_PHONE_NUMBERS.split(",");
+const _TEST_PHONE_NUMBERS = process.env.TEST_PHONE_NUMBERS ?? "";
+const TEST_PHONE_NUMBERS = _TEST_PHONE_NUMBERS.split(",");
 
-let CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
-let CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
-let CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
-let CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
+const CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
+const CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
+const CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
+const CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
 
-let CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
-let CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
-let CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
-let CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
+const CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
+const CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
+const CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
+const CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
+
+
+// PHONE_NUMBER_FILTERING
+const ENABLE_AB_TEST = process.env['ENABLE_AB_TEST'];
+
+
 
 
 export const router = express.Router();
@@ -284,6 +290,8 @@ router.post('/carepay', async (req, res) => {
 
         let mode = "prod"
         // send payload to carepay
+
+        // support [test phone number -> dev]
         if (TEST_PHONE_NUMBERS.indexOf(`${data?.telecom?.[0]?.value ?? data?.telecom?.[1]?.value }`) > -1 ){
           // dev environment
           mode = "dev"
@@ -310,6 +318,7 @@ router.post('/carepay', async (req, res) => {
         // console.log(`Res: ${JSON.stringify(carepayResponse)}`)
 
         if(carepayResponse.status === 400){
+          sendTurnNotification(data, "ENROLMENT_REJECTION");
           res.statusCode = 400;
           res.json({
             "resourceType": "OperationOutcome",
@@ -335,6 +344,7 @@ router.post('/carepay', async (req, res) => {
           data.identifier.push(carepayFhirId, carepayPatientRef);
         }
         data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
+        sendTurnNotification(data, "ENROLMENT_CONFIRMATION");
         res.json(data);
         return;
     } catch (error) {

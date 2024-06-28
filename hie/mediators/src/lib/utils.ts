@@ -212,3 +212,28 @@ createEncounterSubscription()
 createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '');
 
 
+type MessageTypes = "ENROLMENT_CONFIRMATION" | "ENROLMENT_REJECTION" | "SURVEY_FOLLOW_UP"
+
+export const sendTurnNotification = async (data: any, type: MessageTypes) => {
+    try {
+      let patient = await (await FhirApi({url: `/${data?.subject?.reference}`})).data;
+
+
+      let phoneNumber = patient?.telecom?.[0]?.value ?? data?.telecom?.[1]?.value 
+
+
+      // call mediator
+      let TURN_MEDIATOR_ENDPOINT = process.env['TURN_MEDIATOR_ENDPOINT'] ?? "";
+      let OPENHIM_CLIENT_ID = process.env['OPENHIM_CLIENT_ID'] ?? "";
+      let OPENHIM_CLIENT_PASSWORD = process.env['OPENHIM_CLIENT_PASSWORD'] ?? "";
+      let response = await (await fetch(TURN_MEDIATOR_ENDPOINT, {
+        body: JSON.stringify({phone: phoneNumber, type}),
+        method: "POST",
+        headers:{"Content-Type":"application/json",
+        "Authorization": 'Basic ' + Buffer.from(OPENHIM_CLIENT_ID + ':' + OPENHIM_CLIENT_PASSWORD).toString('base64')}
+      })).json();
+      return response;
+    } catch (error) {
+        return {error}
+    }
+}
