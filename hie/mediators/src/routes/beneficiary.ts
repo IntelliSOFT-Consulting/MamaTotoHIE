@@ -299,7 +299,7 @@ router.post('/carepay', async (req, res) => {
         let cpEndpointUrl = `${mode==="dev" ? CAREPAY_DEV_BASE_URL: CAREPAY_BASE_URL}/beneficiary/policies/${mode==="dev" ? CAREPAY_DEV_POLICY_ID: CAREPAY_POLICY_ID}/enrollments/beneficiary`
         // console.log(cpEndpointUrl);
         let accessToken = authToken['accessToken'];
-        let carepayBeneficiaryPayload = await fhirPatientToCarepayBeneficiary(data);
+        let carepayBeneficiaryPayload = await fhirPatientToCarepayBeneficiary(data, mode);
         console.log(carepayBeneficiaryPayload);
         let carepayResponse = await(await (fetch(cpEndpointUrl, {
             method: "POST",

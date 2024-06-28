@@ -99,7 +99,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
                 // "height": 140,
                 // "weight": -1.7976931348623157e+308,
                 // "bmi": -1.7976931348623157e+308,
-                "categoryId": mode === "dev" ?  CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID,
+                "categoryId":`${mode === "dev" ?  CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID}`,
                 "policyId": `${mode === "dev" ?  CAREPAY_DEV_POLICY_ID :CAREPAY_POLICY_ID}`,
                 "relationship": "PRIMARY",
                 "phoneNumber": n?.phone ?? n?.mobile,
@@ -199,8 +199,9 @@ export const fetchVisits = async (status: string | null = null) => {
     })).json();
     console.log(`Fetching visits ${visits.length} `);
     for (let visit of visits){
+      console.log(visit);
       let encounter = await buildEncounter(visit);
-      // console.log(encounter);
+      console.log(encounter);
       // return encounter
     }
     // Save the current timestamp to the file
