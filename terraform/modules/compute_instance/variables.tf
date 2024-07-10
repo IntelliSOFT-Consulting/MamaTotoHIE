@@ -3,25 +3,19 @@ variable "instance_name" {
   type        = string
 }
 
-variable "machine_type" {
-  description = "Type of the machine"
+variable "project" {
+  description = "The project ID"
   type        = string
 }
 
 variable "zone" {
-  description = "Zone of the instance"
+  description = "The zone where the instance will be created"
   type        = string
 }
 
-variable "project_id" {
-  description = "Project ID"
+variable "external_ip" {
+  description = "External IP address"
   type        = string
-}
-
-variable "auto_delete" {
-  description = "Whether the boot disk should be auto-deleted"
-  type        = bool
-  default     = false
 }
 
 variable "disk_source" {
@@ -29,77 +23,17 @@ variable "disk_source" {
   type        = string
 }
 
-variable "device_name" {
-  description = "Name of the device"
+variable "network_url" {
+  description = "The network URL"
   type        = string
 }
 
-variable "disk_size" {
-  description = "Size of the disk"
-  type        = number
-}
-
-variable "disk_type" {
-  description = "Type of the disk"
+variable "subnetwork_url" {
+  description = "The subnetwork URL"
   type        = string
 }
 
-variable "network" {
-  description = "Network URL"
+variable "ssh_keys" {
+  description = "SSH keys for the instance"
   type        = string
-}
-
-variable "subnetwork" {
-  description = "Subnetwork URL"
-  type        = string
-}
-
-variable "nat_ip" {
-  description = "NAT IP address"
-  type        = string
-}
-
-variable "network_tier" {
-  description = "Network tier"
-  type        = string
-  default     = "PREMIUM"
-}
-
-variable "automatic_restart" {
-  description = "Whether the instance should automatically restart"
-  type        = bool
-  default     = true
-}
-
-variable "on_host_maintenance" {
-  description = "Maintenance behavior"
-  type        = string
-  default     = "MIGRATE"
-}
-
-variable "service_account_email" {
-  description = "Service account email"
-  type        = string
-}
-
-variable "scopes" {
-  description = "Service account scopes"
-  type        = list(string)
-}
-
-variable "enable_integrity_monitoring" {
-  description = "Enable integrity monitoring"
-  type        = bool
-  default     = true
-}
-
-variable "enable_vtpm" {
-  description = "Enable vTPM"
-  type        = bool
-  default     = true
-}
-
-variable "tags" {
-  description = "Instance tags"
-  type        = list(string)
 }

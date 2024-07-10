@@ -1,42 +1,29 @@
-resource "google_compute_instance" "compute_instance" {
-  name         = var.instance_name
-  machine_type = var.machine_type
-  zone         = var.zone
-  project      = var.project_id
-
+resource "google_compute_instance" "instance" {
   boot_disk {
-    auto_delete = var.auto_delete
+    auto_delete = true
     source      = var.disk_source
-    device_name = var.device_name
-    initialize_params {
-      size = var.disk_size
-      type = var.disk_type
-    }
   }
 
+  guest_accelerator {
+    count = 1
+    type  = "nvidia-tesla-t4"
+  }
+
+  machine_type = "n1-standard-4"
+  metadata = {
+    enable-oslogin = "TRUE"
+    ssh-keys       = var.ssh_keys
+  }
+
+  name              = var.instance_name
   network_interface {
-    network    = var.network
-    subnetwork = var.subnetwork
     access_config {
-      nat_ip       = var.nat_ip
-      network_tier = var.network_tier
+      nat_ip = var.external_ip
     }
+    network    = var.network_url
+    subnetwork = var.subnetwork_url
   }
 
-  scheduling {
-    automatic_restart   = var.automatic_restart
-    on_host_maintenance = var.on_host_maintenance
-  }
-
-  service_account {
-    email  = var.service_account_email
-    scopes = var.scopes
-  }
-
-  shielded_instance_config {
-    enable_integrity_monitoring = var.enable_integrity_monitoring
-    enable_vtpm                 = var.enable_vtpm
-  }
-
-  tags = var.tags
+  project = var.project
+  zone    = var.zone
 }
