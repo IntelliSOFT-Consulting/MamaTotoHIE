@@ -12,7 +12,7 @@ import Beneficiary from './routes/beneficiary'
 import Visit from './routes/visit'
 import Callback from './routes/callback'
 
-import { fetchVisits } from "./lib/payloadMapping";
+import { fetchVisits, fetchVisitsDev } from "./lib/payloadMapping";
 
 
 const app = express();
@@ -50,6 +50,5 @@ cron.schedule('*/2 * * * *', () => {
   console.log('Cron job running every two minutes');
   // Add your task logic here
   fetchVisits();
+  fetchVisitsDev();
 });
-
-fetchVisits();
