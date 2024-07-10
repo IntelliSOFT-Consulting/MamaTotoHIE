@@ -1,0 +1,9 @@
+project_id           = "paf-hdc-dev"
+region               = "europe-west4"
+zone                 = "europe-west4-a"
+disk_size            = 80
+address_ip           = "35.204.24.214"
+network_name         = "default"
+subnetwork_name      = "default"
+machine_type         = "e2-custom-2-8704"
+service_account_email = "407929771288-compute@developer.gserviceaccount.com"
