@@ -34,7 +34,7 @@ module "compute_instance" {
   disk_source       = "https://www.googleapis.com/compute/v1/projects/${var.project_id}/zones/${var.zone}/disks/mamatoto-hie-disk"
   network_url       = "https://www.googleapis.com/compute/v1/projects/${var.project_id}/global/networks/default"
   subnetwork_url    = "https://www.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region}/subnetworks/default"
-  ssh_keys          = "mnyagah:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCq+IQoHY1Ymgi0nyCwKnFqCf5zj7HlbyXR1UxvxRXqIrNhT4qKjWXsRaPqDubZsufyqXBoQbV6rSXAzmeEX/mYKavvFKU7kOJc3lsjw1gcIyvHKw4zrTsSCxvtGKo6RdTyJ+PLFrqkpWyZNvEkjMmAvIisLsd/KB1yymNpZq/dyhc7gEeQKO7RUFCYI9vF/DU2E/TzBW8ENvXawn5W6ZMRMwuoa88RBJ+p50lWKZ5R1qZgmCnOHzeFKz+G+2ydjAicXYJu4PqvrA2cUAn5WUF0U+5eRR0CdB8r9hs0AGTkZdhSHoa89r5FWyjTuZnteXIaC4iWTwSa2Sh6MzFpqm8F google-ssh {\"userName\":\"mnyagah@pharmaccess.io\",\"expireOn\":\"2024-06-14T10:08:05+0000\"}"
+  ssh_keys          = var.ssh_keys
 }
 
 module "compute_instance_template" {
