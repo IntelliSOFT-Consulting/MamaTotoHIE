@@ -212,3 +212,31 @@ export const fetchVisits = async (status: string | null = null) => {
   }
 }
 
+
+export const fetchVisitsDev = async (status: string | null = null) => {
+  try {
+
+    let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
+    // let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${readLastRunTimestamp() ?? getLastYearISOString()}`;
+     // send payload to carepay
+     let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
+     let authToken = await(await (fetch(cpLoginUrl,{
+         method:"POST", body: JSON.stringify({"username":CAREPAY_DEV_USERNAME, "password":CAREPAY_DEV_PASSWORD}),
+         headers:{"Content-Type":"application/json"}
+     }))).json();
+     let accessToken = authToken['accessToken'];
+    let visits =  await (await fetch(cpUrl, {
+      headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
+    })).json();
+    console.log(`Fetching visits ${visits.length} `);
+    for (let visit of visits){
+      let encounter = await buildEncounter(visit);
+      // console.log(encounter);
+      // return encounter
+    }
+    // Save the current timestamp to the file
+    // fs.writeFileSync(LAST_RUN_FILE, new Date().toISOString());
+  } catch (error) {
+    return {error} 
+  }
+}
