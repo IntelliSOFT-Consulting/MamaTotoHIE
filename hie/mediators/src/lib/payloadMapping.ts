@@ -78,110 +78,6 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
 
     let maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
 
-<<<<<<< HEAD
-        return {
-<<<<<<< HEAD
-                "title": gender == "MALE" ? "MR" : "MRS" ,
-                "firstName": patient.name[0].given[0] ?? "",
-                ...(patient.name[0].given[1] ? true: false) && {"middleName": patient.name[0].given[1]},
-                ...(patient.name[0].family ? true: false) && {"lastName": patient.name[0].family},
-                "gender": gender,
-                "dateOfBirth": patient.birthDate,
-                // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
-                "maritalStatus": maritalStatus === "M"? "MARRIED" : "SINGLE",
-                // "nationality": "KE",
-                "identification": [
-                  {
-                    "type": "NATIONAL_ID",
-                    "number": `${patient?.identifier?.[0]?.value}`
-                  }
-                ],
-                // "acceptTermsAndCondition": true,
-                // "occupation": "EMPLOYED",
-                // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
-                "residentialCountryCode": "string",
-                // "height": 140,
-                // "weight": -1.7976931348623157e+308,
-                // "bmi": -1.7976931348623157e+308,
-                "categoryId":`${mode === "dev" ?  CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID}`,
-                "policyId": `${mode === "dev" ?  CAREPAY_DEV_POLICY_ID :CAREPAY_POLICY_ID}`,
-                "relationship": "PRIMARY",
-                "phoneNumber": n?.phone ?? n?.mobile,
-                // "dateOfEnrollment": "2014-02-07",
-                "startDate": new Date().toISOString(),
-                // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-                // "medicalApplicationForm": {
-                //   "mafConditions": [
-                //     {
-                //       "question": "Diabetes, gout, or any disorder of thyroid, or other glands.",
-                //       "answer": true,
-                //       "answerDetails": "My diabetes was diagnosed 2 years ago, and I have been under controlled treatment ever since.",
-                //       "premiumImpact": 0.1,
-                //       "medicalCodes": [
-                //         {
-                //           "codingStandard": "ICD-10-CM",
-                //           "code": "A15-A19"
-                //         }
-                //       ]
-                //     }
-                //   ],
-                //   "signatureDate": getCurrentDate()
-                // }
-              }
-=======
-          "title": gender == "MALE" ? "MR" : "MRS" ,
-          "firstName": patient.name[0].given[0] ?? "",
-          ...(patient.name[0].given[1] ? true: false) && {"middleName": patient.name[0].given[1]},
-          ...(patient.name[0].family ? true: false) && {"lastName": patient.name[0].family},
-          "gender": gender,
-          "dateOfBirth": patient.birthDate,
-          // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
-          "maritalStatus": maritalStatus === "M"? "MARRIED" : "SINGLE",
-          // "nationality": "KE",
-          "identification": [
-            {
-              "type": "NATIONAL_ID",
-              "number": `${patient?.identifier?.[0]?.value}`
-            }
-          ],
-          // "acceptTermsAndCondition": true,
-          // "occupation": "EMPLOYED",
-          // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
-          "residentialCountryCode": "string",
-          // "height": 140,
-          // "weight": -1.7976931348623157e+308,
-          // "bmi": -1.7976931348623157e+308,
-          "categoryId":`${mode === "dev" ?  CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID}`,
-          "policyId": `${mode === "dev" ?  CAREPAY_DEV_POLICY_ID :CAREPAY_POLICY_ID}`,
-          "relationship": "PRIMARY",
-          "phoneNumber": n?.phone ?? n?.mobile,
-          // "dateOfEnrollment": "2014-02-07",
-          "startDate": new Date().toISOString(),
-          // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-          // "medicalApplicationForm": {
-          //   "mafConditions": [
-          //     {
-          //       "question": "Diabetes, gout, or any disorder of thyroid, or other glands.",
-          //       "answer": true,
-          //       "answerDetails": "My diabetes was diagnosed 2 years ago, and I have been under controlled treatment ever since.",
-          //       "premiumImpact": 0.1,
-          //       "medicalCodes": [
-          //         {
-          //           "codingStandard": "ICD-10-CM",
-          //           "code": "A15-A19"
-          //         }
-          //       ]
-          //     }
-          //   ],
-          //   "signatureDate": getCurrentDate()
-          // }
-        }
->>>>>>> af1858cc65a632d1bf005fde92236460913d4930
-        }
-    catch (error) {
-        console.log(error);
-        return null;    
-=======
     return {
       "title": gender == "MALE" ? "MR" : "MRS",
       "firstName": patient.name[0].given[0] ?? "",
@@ -229,7 +125,6 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
       //   ],
       //   "signatureDate": getCurrentDate()
       // }
->>>>>>> 622ab3ee3a5a46aedc423f2e5d713ce9c33a1fa1
     }
   }
   catch (error) {
@@ -299,12 +194,7 @@ export const fetchVisits = async (status: string | null = null) => {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
     })).json();
     console.log(`Fetching visits ${visits.length} `);
-<<<<<<< HEAD
-    for (let visit of visits){
-      console.log(visit);
-=======
     for (let visit of visits) {
->>>>>>> 622ab3ee3a5a46aedc423f2e5d713ce9c33a1fa1
       let encounter = await buildEncounter(visit);
       console.log(encounter);
       // return encounter
