@@ -1,5 +1,4 @@
 import express from 'express';
-import { FhirApi} from '../lib/utils';
 import fetch from 'node-fetch';
 
 let SURVEY_FOLLOW_UP = process.env['SURVEY_FOLLOW_UP_URL'] ?? '';
@@ -23,7 +22,6 @@ router.post('/turn', async (req, res) => {
         // console.log("CarePay Request Payload", data);
 
         // fetch patient & send payload to turn.io
-        // Notificationtype.
         let turnResponse = (await (fetch(urls[data?.type], {
             method: "POST",
             body:JSON.stringify({"wa_id":`${data?.phone }`}),
@@ -31,9 +29,9 @@ router.post('/turn', async (req, res) => {
         })))
 
         // console.log(`Res: ${JSON.stringify(turnResponse)}`)
-        res.statusCode =turnResponse.status;
+        // res.statusCode =turnResponse.status;
         let turnResponseJson = await turnResponse.json();
-        res.json(turnResponseJson);
+        // res.json(turnResponseJson);
         if(turnResponseJson?.errors?.[0]?.details.includes("active session")){
             let claim = await (await (fetch(`https://whatsapp.turn.io/v1/contacts/${(data.phone).replace(/^\+/, '')}/claim`, {
                 method: "GET",
@@ -45,7 +43,7 @@ router.post('/turn', async (req, res) => {
                 body: JSON.stringify({claim_uuid: claim.uuid}),
                 headers: {"Accept":"application/vnd.v1+json", "Authorization":`Bearer ${TURN_IO_ACCESS_TOKEN}`}
             })));
-            console.log(deleteClaim)
+            console.log(deleteClaim);
 
             // try again 
             let turnResponse = (await (fetch(urls[data?.type], {

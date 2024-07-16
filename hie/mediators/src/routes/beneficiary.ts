@@ -22,9 +22,6 @@ const CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
 // PHONE_NUMBER_FILTERING
 const ENABLE_AB_TEST = process.env['ENABLE_AB_TEST'];
 
-
-
-
 export const router = express.Router();
 
 router.use(express.json());
@@ -268,7 +265,6 @@ router.post('/', async (req, res) => {
 });
 
 
-
 //process FHIR Beneficiary
 router.post('/carepay', async (req, res) => {
     try {
@@ -327,7 +323,7 @@ router.post('/carepay', async (req, res) => {
                 "severity": "error",
                 "code": "exception",
                 "details": {
-                    "text": `Failed to post beneficiary- ${JSON.stringify(carepayResponse)}`
+                    "text": `Failed to post beneficiary - ${JSON.stringify(carepayResponse)}`
                 }
             }]
           });
@@ -337,11 +333,10 @@ router.post('/carepay', async (req, res) => {
         // data['identifier'] = [];
         console.log(carepayResponse);
         let carepayFhirId = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-MEMBER-NUMBER", display: "Carepay Member Number"}]}, value: carepayResponse.membershipNumber}
-        let carepayPatientRef = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref"}]}, value: carepayResponse.id}
         if(!data.identifier){
-          data.identifier = [carepayFhirId, carepayPatientRef];
+          data.identifier = [carepayFhirId];
         }else{
-          data.identifier.push(carepayFhirId, carepayPatientRef);
+          data.identifier.push(carepayFhirId);
         }
         data = await (await (FhirApi({url: `/Patient/${data.id}`, method:"PUT", data: JSON.stringify(data)}))).data
         sendTurnNotification(data, "ENROLMENT_CONFIRMATION");
@@ -376,10 +371,9 @@ router.put('/notifications/Patient/:id', async (req, res) => {
       let parsedIds  = await processIdentifiers(identifiers);
       // console.log(parsedIds);
 
-      // console.log(tag, identifiers);
+      // if these ids have already been assigned...
       if (tag || Object.keys(parsedIds).indexOf('CAREPAY-MEMBER-NUMBER') > -1 || Object.keys(parsedIds).indexOf('CAREPAY-PATIENT-REF') > -1){
         res.statusCode = 200;
-        // console.log("found: ", tag, identifiers);
         res.json(data);
         return;
       }
