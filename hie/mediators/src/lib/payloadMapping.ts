@@ -37,8 +37,8 @@ const getCurrentDate = () => new Date().toISOString().slice(0, 10);
 
 export const processIdentifiers = async (identifiers: any) => {
   try {
-    let ids:any = {};
-    for(let id of identifiers){
+    let ids: any = {};
+    for (let id of identifiers) {
       let idType = id?.type?.coding[0].code;
       let idSystem = id?.type?.coding[0].system;
       ids[idType] = id?.value;
@@ -49,7 +49,7 @@ export const processIdentifiers = async (identifiers: any) => {
   }
 }
 
-function generateRandomString(length:number) {
+function generateRandomString(length: number) {
   let result = '';
   const characters = '0123456789';
   const charactersLength = characters.length;
@@ -62,83 +62,83 @@ function generateRandomString(length:number) {
 
 
 export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string = "dev") => {
-    try {
-        let gender = String(patient.gender).toUpperCase();
-        let _date = String(patient.birthDate).split("-");
-        // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
-        let n:any = {};
+  try {
+    let gender = String(patient.gender).toUpperCase();
+    let _date = String(patient.birthDate).split("-");
+    // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
+    let n: any = {};
 
-        let phoneNumbers = patient.telecom;
-        phoneNumbers.map( ( numb:any ) => {
-          if (Object.keys(numb).indexOf('value') > -1){
-              n[numb.system] = numb.value;
-          }
-        })
-        // console.log(n);
+    let phoneNumbers = patient.telecom;
+    phoneNumbers.map((numb: any) => {
+      if (Object.keys(numb).indexOf('value') > -1) {
+        n[numb.system] = numb.value;
+      }
+    })
+    // console.log(n);
 
-        let maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
+    let maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
 
-        return {
-          "title": gender == "MALE" ? "MR" : "MRS" ,
-          "firstName": patient.name[0].given[0] ?? "",
-          ...(patient.name[0].given[1] ? true: false) && {"middleName": patient.name[0].given[1]},
-          ...(patient.name[0].family ? true: false) && {"lastName": patient.name[0].family},
-          "gender": gender,
-          "dateOfBirth": patient.birthDate,
-          // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
-          "maritalStatus": maritalStatus === "M"? "MARRIED" : "SINGLE",
-          // "nationality": "KE",
-          "identification": [
-            {
-              "type": "NATIONAL_ID",
-              "number": `${patient?.identifier?.[0]?.value}`
-            }
-          ],
-          // "acceptTermsAndCondition": true,
-          // "occupation": "EMPLOYED",
-          // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
-          "residentialCountryCode": "string",
-          // "height": 140,
-          // "weight": -1.7976931348623157e+308,
-          // "bmi": -1.7976931348623157e+308,
-          "categoryId":`${mode === "dev" ?  CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID}`,
-          "policyId": `${mode === "dev" ?  CAREPAY_DEV_POLICY_ID :CAREPAY_POLICY_ID}`,
-          "relationship": "PRIMARY",
-          "phoneNumber": n?.phone ?? n?.mobile,
-          // "dateOfEnrollment": "2014-02-07",
-          "startDate": new Date().toISOString(),
-          // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-          // "medicalApplicationForm": {
-          //   "mafConditions": [
-          //     {
-          //       "question": "Diabetes, gout, or any disorder of thyroid, or other glands.",
-          //       "answer": true,
-          //       "answerDetails": "My diabetes was diagnosed 2 years ago, and I have been under controlled treatment ever since.",
-          //       "premiumImpact": 0.1,
-          //       "medicalCodes": [
-          //         {
-          //           "codingStandard": "ICD-10-CM",
-          //           "code": "A15-A19"
-          //         }
-          //       ]
-          //     }
-          //   ],
-          //   "signatureDate": getCurrentDate()
-          // }
+    return {
+      "title": gender == "MALE" ? "MR" : "MRS",
+      "firstName": patient.name[0].given[0] ?? "",
+      ...(patient.name[0].given[1] ? true : false) && { "middleName": patient.name[0].given[1] },
+      ...(patient.name[0].family ? true : false) && { "lastName": patient.name[0].family },
+      "gender": gender,
+      "dateOfBirth": patient.birthDate,
+      // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
+      "maritalStatus": maritalStatus === "M" ? "MARRIED" : "SINGLE",
+      // "nationality": "KE",
+      "identification": [
+        {
+          "type": "NATIONAL_ID",
+          "number": `${patient?.identifier?.[0]?.value}`
         }
-        }
-    catch (error) {
-        console.log(error);
-        return null;    
+      ],
+      // "acceptTermsAndCondition": true,
+      // "occupation": "EMPLOYED",
+      // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
+      "residentialCountryCode": "string",
+      // "height": 140,
+      // "weight": -1.7976931348623157e+308,
+      // "bmi": -1.7976931348623157e+308,
+      "categoryId": `${mode === "dev" ? CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID}`,
+      "policyId": `${mode === "dev" ? CAREPAY_DEV_POLICY_ID : CAREPAY_POLICY_ID}`,
+      "relationship": "PRIMARY",
+      "phoneNumber": n?.phone ?? n?.mobile,
+      // "dateOfEnrollment": "2014-02-07",
+      "startDate": new Date().toISOString(),
+      // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+      // "medicalApplicationForm": {
+      //   "mafConditions": [
+      //     {
+      //       "question": "Diabetes, gout, or any disorder of thyroid, or other glands.",
+      //       "answer": true,
+      //       "answerDetails": "My diabetes was diagnosed 2 years ago, and I have been under controlled treatment ever since.",
+      //       "premiumImpact": 0.1,
+      //       "medicalCodes": [
+      //         {
+      //           "codingStandard": "ICD-10-CM",
+      //           "code": "A15-A19"
+      //         }
+      //       ]
+      //     }
+      //   ],
+      //   "signatureDate": getCurrentDate()
+      // }
     }
+  }
+  catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 export const buildEncounter = async (visit: any) => {
   try {
-    let patient = await (await FhirApi({url: `/Patient?identifier=${visit.patientRef}`})).data;
+    let patient = await (await FhirApi({ url: `/Patient?identifier=${visit.patientRef}` })).data;
     // console.log(patient);
-    if(!(patient?.total) || !(patient?.entry)){
-      return {"error": "Patient not found"}
+    if (!(patient?.total) || !(patient?.entry)) {
+      return { "error": "Patient not found" }
     }
     let status = String(visit.status).toLowerCase();
     let encounterPayload = {
@@ -148,20 +148,20 @@ export const buildEncounter = async (visit: any) => {
       subject: {
         reference: `Patient/${patient?.entry[0].resource?.id}`
       },
-      period:{
+      period: {
         start: visit.date,
         end: visit.endDate
       },
-      extension:[
+      extension: [
         {
           url: "https://mamatoto.dev/StructureDefinition/patient-benefit",
-          valueReference:{
+          valueReference: {
             reference: `Coverage/${visit.benefitRef}`
           }
         },
         {
           url: "https://mamatoto.dev/StructureDefinition/patient-plan",
-          valueReference:{
+          valueReference: {
             reference: `Coverage/${visit.planRef}`
           }
         },
@@ -170,11 +170,11 @@ export const buildEncounter = async (visit: any) => {
         reference: `Organization/${visit.providerRef}`
       }
     }
-    let encounter = await FhirApi({url: `/Encounter/${encounterPayload.id}`, method: "PUT", data: JSON.stringify(encounterPayload)});
+    let encounter = await FhirApi({ url: `/Encounter/${encounterPayload.id}`, method: "PUT", data: JSON.stringify(encounterPayload) });
     // console.log(encounter);
     return encounter;
   } catch (error) {
-    return {error};
+    return { error };
   }
 }
 const getLastYearISOString = () => {
@@ -188,55 +188,89 @@ export const fetchVisits = async (status: string | null = null) => {
   try {
 
     let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
-    // let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${readLastRunTimestamp() ?? getLastYearISOString()}`;
-     // send payload to carepay
-     let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
-     let authToken = await(await (fetch(cpLoginUrl,{
-         method:"POST", body: JSON.stringify({"username":CAREPAY_USERNAME, "password":CAREPAY_PASSWORD}),
-         headers:{"Content-Type":"application/json"}
-     }))).json();
-     let accessToken = authToken['accessToken'];
-    let visits =  await (await fetch(cpUrl, {
-      headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
+    let authToken = await getCarepayAuthToken("prod");
+    let accessToken = authToken['accessToken'];
+    let visits = await (await fetch(cpUrl, {
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
     })).json();
     console.log(`Fetching visits ${visits.length} `);
-    for (let visit of visits){
+    for (let visit of visits) {
       let encounter = await buildEncounter(visit);
-      // console.log(encounter);
+      console.log(encounter);
       // return encounter
     }
     // Save the current timestamp to the file
     // fs.writeFileSync(LAST_RUN_FILE, new Date().toISOString());
   } catch (error) {
-    return {error} 
+    return { error }
   }
 }
 
 
-export const fetchVisitsDev = async (status: string | null = null) => {
+export const fetchApprovedEndorsements = async (mode: string = "dev") => {
+  try {
+    let dev = mode === "dev";
+    let authToken = await getCarepayAuthToken(mode);
+    let accessToken = authToken['accessToken'];
+    let cpUrl = `${dev ? CAREPAY_DEV_BASE_URL : CAREPAY_BASE_URL}/beneficiary/beneficiaries?policyIds=${dev ? CAREPAY_DEV_POLICY_ID : CAREPAY_POLICY_ID}`;
+    let beneficiaries = await (await fetch(cpUrl, {
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
+    })).json();
+    // console.log(beneficiaries);
+    for (let i of beneficiaries) {
+      let patient = await (await FhirApi({ url: `/Patient?identifier=${i.membershipNumber}` })).data;
+      let patientResource = patient?.entry?.resource;
+      let carepayPatientRef = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref"}]}, value: i.id}
+        patientResource.identifier[3] = carepayPatientRef
+      // update patient;
+      let updated = await (await FhirApi({ url: `/Patient/${patient?.entry?.resource?.id}`, method: "PUT", 
+        data: JSON.stringify({...patientResource})})).data;
+      console.log(updated.id);
+    }
+    return beneficiaries;
+
+  } catch (error) {
+    return false;
+  }
+}
+
+
+export const fetchVisitsDev = async () => {
   try {
 
-    let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
-    // let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${readLastRunTimestamp() ?? getLastYearISOString()}`;
-     // send payload to carepay
-     let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
-     let authToken = await(await (fetch(cpLoginUrl,{
-         method:"POST", body: JSON.stringify({"username":CAREPAY_DEV_USERNAME, "password":CAREPAY_DEV_PASSWORD}),
-         headers:{"Content-Type":"application/json"}
-     }))).json();
-     let accessToken = authToken['accessToken'];
-    let visits =  await (await fetch(cpUrl, {
-      headers: {"Content-Type":"application/json", "Authorization":`Bearer ${accessToken}`}
+    let cpUrl = `${CAREPAY_DEV_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
+    // send payload to carepay
+    let authToken = await getCarepayAuthToken("dev");
+    let accessToken = authToken['accessToken'];
+    let visits = await (await fetch(cpUrl, {
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
     })).json();
     console.log(`Fetching visits ${visits.length} `);
-    for (let visit of visits){
+    for (let visit of visits) {
       let encounter = await buildEncounter(visit);
-      // console.log(encounter);
+      console.log(encounter);
       // return encounter
     }
     // Save the current timestamp to the file
-    // fs.writeFileSync(LAST_RUN_FILE, new Date().toISOString());
   } catch (error) {
-    return {error} 
+    return { error }
+  }
+}
+
+
+export const getCarepayAuthToken = async (mode: string = "dev") => {
+  try {
+    let dev = mode === "dev";
+    let cpLoginUrl = `${dev ? CAREPAY_DEV_BASE_URL : CAREPAY_BASE_URL}/usermanagement/login`;
+    let accessToken = await (await (fetch(cpLoginUrl, {
+      method: "POST", body: JSON.stringify({
+        "username": dev ? CAREPAY_DEV_USERNAME : CAREPAY_USERNAME,
+        "password": dev ? CAREPAY_DEV_PASSWORD : CAREPAY_PASSWORD
+      }),
+      headers: { "Content-Type": "application/json" }
+    }))).json();
+    return accessToken;
+  } catch (error) {
+    return null;
   }
 }
