@@ -11,4 +11,5 @@ module "compute" {
 module "network" {
     source = "./network"
     project_name = "hdc-test-arena"
+    project_network = "vpc-network"
 }

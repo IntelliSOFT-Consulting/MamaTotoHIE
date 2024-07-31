@@ -30,14 +30,6 @@ resource "google_compute_instance" "mamatoto_hie_server" {
     interface = "NVME"
   }
 
-  # network_interface {
-  #   network = "default"
-
-  #   access_config {
-  #     // Ephemeral public IP
-  #   }
-  # }
-
   network_interface {
     access_config {
       nat_ip       = ""
