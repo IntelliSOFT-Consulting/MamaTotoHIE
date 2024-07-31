@@ -48,7 +48,7 @@ resource "google_compute_instance" "mamatoto_hie_server" {
       network_tier = "PREMIUM"
     }
 
-    network            = "default"
+    network            = "vpc-network"
     network_ip         = ""
     stack_type         = "IPV4_ONLY"
     subnetwork         = "https://www.googleapis.com/compute/v1/projects/hdc-test-arena/regions/europe-west4/subnetworks/default"
