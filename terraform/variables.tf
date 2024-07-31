@@ -12,3 +12,8 @@ variable "zone" {
   description = "The zone where resources will be created"
   type        = string
 }
+
+variable "ssh_keys" {
+  description = "The ssh keys will be created"
+  type        = string
+}

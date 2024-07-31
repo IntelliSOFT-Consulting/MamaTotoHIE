@@ -17,3 +17,8 @@ variable "internal_ip" {
   description = "Internal IP address"
   type        = string
 }
+
+variable "address_type" {
+  description = "address type"
+  type        = string
+}

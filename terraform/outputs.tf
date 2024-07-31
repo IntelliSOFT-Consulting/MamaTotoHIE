@@ -25,3 +25,6 @@ output "service_account_emails" {
 output "storage_bucket_names" {
   value = module.storage_bucket.names
 }
+
+
+

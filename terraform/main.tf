@@ -13,6 +13,7 @@ module "compute_disk" {
 
 module "compute_address" {
   source       = "./modules/compute_address"
+  address_type = "EXTERNAL"
   project      = var.project_id
   region       = var.region
   external_ip  = "35.204.24.214"
@@ -40,6 +41,7 @@ module "compute_instance" {
 module "compute_instance_template" {
   source        = "./modules/compute_instance_template"
   project       = var.project_id
+  machine_type = var.machine_type
   instance_name = "instance-template-1"
 }
 

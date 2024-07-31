@@ -13,3 +13,7 @@ output "allow_icmp_name" {
 output "allow_internal_name" {
   value = google_compute_firewall.allow_internal.name
 }
+
+output "name" {
+  value = google_compute_firewall.this.name
+}

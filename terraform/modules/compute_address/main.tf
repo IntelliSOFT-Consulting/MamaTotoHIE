@@ -7,9 +7,9 @@ resource "google_compute_address" "external" {
   region       = var.region
 }
 
-resource "google_compute_address" "internal" {
+resource "google_compute_address" "this" {
   address      = var.internal_ip
-  address_type = "INTERNAL"
+  address_type = var.address_type
   description  = "Mama toto dev server"
   name         = "mama-toto-dev-server"
   network_tier = "PREMIUM"
