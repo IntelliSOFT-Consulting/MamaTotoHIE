@@ -1,4 +1,4 @@
-resource "google_project_service" "project" {
+resource "google_project_service" "compute_api" {
   project = var.project_name
   service = "compute.googleapis.com"
 
