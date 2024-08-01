@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"compute","Source":"./compute","Dir":"compute"},{"Key":"folders","Source":"./folders","Dir":"folders"},{"Key":"network","Source":"./network","Dir":"network"},{"Key":"projects","Source":"./projects","Dir":""}]}
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"cloudsql","Source":"./cloudsql","Dir":"cloudsql"},{"Key":"compute","Source":"./compute","Dir":"compute"},{"Key":"folders","Source":"./folders","Dir":"folders"},{"Key":"network","Source":"./network","Dir":"network"},{"Key":"projects","Source":"./projects","Dir":""}]}

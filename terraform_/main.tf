@@ -8,3 +8,7 @@ module "network" {
     source = "./network"
     project_name = "hdc-test-arena"
 }
+
+module "cloudsql" {
+    source = "./cloudsql"
+}
