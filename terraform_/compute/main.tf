@@ -29,7 +29,6 @@ resource "google_compute_instance" "mamatoto_hie_server" {
     auto_delete = false
     initialize_params {
       image = "debian-cloud/debian-11"
-      size = 80
       labels = {
         my_label = "mamatoto-hie-disk"
       }
@@ -80,4 +79,9 @@ resource "google_compute_disk" "mamatotodisk" {
     environment = "dev"
   }
   physical_block_size_bytes = 4096
+}
+
+resource "google_compute_attached_disk" "datadisk-attach" {
+  disk     = google_compute_disk.mamatotodisk.id
+  instance = google_compute_instance.mamatoto_hie_server.id
 }
