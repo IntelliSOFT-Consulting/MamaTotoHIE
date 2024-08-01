@@ -18,7 +18,7 @@ resource "google_service_account" "default" {
 resource "google_compute_instance" "mamatoto_hie_server" {
   name         = "mamatoto-hie-disk"
   machine_type = "n2-standard-2"
-  zone         = "europe-west4-a"
+  zone         = "us-central1-a"
 
   tags = ["http-server", "https-server"]
 
@@ -37,23 +37,14 @@ resource "google_compute_instance" "mamatoto_hie_server" {
     
   }
 
-  // Local SSD disk
-  scratch_disk {
-    interface = "NVME"
-  }
-
   network_interface {
     access_config {
-      nat_ip       = ""
       network_tier = "PREMIUM"
     }
 
     network            = "vpc-network"
-    subnetwork         = "vpc-subnetwork"
-    network_ip         = ""
+    subnetwork         = "test-subnetwork"
     stack_type         = "IPV4_ONLY"
-    subnetwork         = "https://www.googleapis.com/compute/v1/projects/hdc-test-arena/regions/europe-west4/subnetworks/default"
-    subnetwork_project = "hdc-test-arena"
   }
 
   scheduling {
