@@ -7,7 +7,7 @@ resource "google_project_service" "compute_api" {
     update = "40m"
   }
 
-  disable_on_destroy = false
+  disable_on_destroy = true
 }
 
 resource "google_service_account" "default" {
@@ -26,7 +26,6 @@ resource "google_compute_instance" "mamatoto_hie_server" {
 
   boot_disk {
     device_name = "mamatoto-hie-disk"
-    auto_delete = false
     initialize_params {
       image = "debian-cloud/debian-11"
       labels = {
