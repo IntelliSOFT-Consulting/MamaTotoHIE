@@ -8,13 +8,12 @@ dotenv.config() // Load environment variables
 //Import routes 
 const CRON_INTERVAL = Number(process.env.CRON_INTERVAL ?? 10);
 
-
 import Auth from './routes/auth'
 import Beneficiary from './routes/beneficiary'
 import Visit from './routes/visit'
 import Callback from './routes/callback'
 
-import { fetchApprovedEndorsements, fetchVisits, fetchVisitsDev } from "./lib/payloadMapping";
+import { fetchApprovedEndorsements, fetchVisits } from "./lib/payloadMapping";
 
 
 const app = express();
@@ -47,9 +46,6 @@ app.listen(PORT, () => {
 // Set up a cron job to run every three minutes
 cron.schedule(`*/${CRON_INTERVAL} * * * *`, () => {
   console.log(`Cron job running every ${CRON_INTERVAL} minutes`);
-  // Add your task logic here
-  fetchVisits(); // in prod
-  fetchVisitsDev();
-  fetchApprovedEndorsements("dev")
-  fetchApprovedEndorsements("prod")
+  fetchVisits();
+  fetchApprovedEndorsements()
 });
