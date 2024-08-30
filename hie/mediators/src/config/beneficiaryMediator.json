@@ -14,7 +14,9 @@
                     "path": "/beneficiary/carepay",
                     "port": "3000",
                     "primary": true,
-                    "type": "http"
+                    "type": "http",
+                    "status":"enabled"
+
                 }
             ],
             "allow": [
@@ -33,7 +35,9 @@
             "path": "/beneficiary/carepay",
             "port": "3000",
             "primary": true,
-            "type": "http"
+            "type": "http",
+            "status":"enabled"
+
         }
     ]
 }
