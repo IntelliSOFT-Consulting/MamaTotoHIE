@@ -2,6 +2,7 @@ import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import carepayBeneficiary from '../config/beneficiaryMediator.json'
 import turnioMediatorConfig from '../config/turnioNotificationsMediator.json';
+import customRegistrationConfig from '../config/customRegistrationMediators.json'
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
@@ -13,7 +14,8 @@ import { RequestInfo, RequestInit } from 'node-fetch';
 const mediators = [
     shrMediatorConfig,
     carepayBeneficiary,
-    turnioMediatorConfig
+    turnioMediatorConfig,
+    customRegistrationConfig
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
@@ -270,22 +272,44 @@ export const sendTurnNotification = async (data: any, type: MessageTypes) => {
 }
 
 const OPENHIM_DEV_URL = process.env.OPENHIM_DEV_URL ?? '';
-const OPENHIM_DEV_USER = process.env.OPENHIM_DEV_USER ?? '';
-const OPENHIM_DEV_PASSWORD = process.env.OPENHIM_DEV_PASSWORD ?? '';
+const OPENHIM_DEV_CLIENT = process.env.OPENHIM_DEV_CLIENT ?? '';
+const OPENHIM_DEV_CLIENT_PASSWORD = process.env.OPENHIM_DEV_CLIENT_PASSWORD ?? '';
 
 export const redirectToDev = async (data: any) => {
     try {
-        let response = await (await fetch(OPENHIM_DEV_URL, {
+        let response = await fetch(OPENHIM_DEV_URL, {
             method: 'POST', body: JSON.stringify(data),
             headers: {
-                "Authorization": "Basic " + btoa(OPENHIM_DEV_USER + ":" + OPENHIM_DEV_PASSWORD)
+                "Authorization": 'Basic ' + Buffer.from(OPENHIM_DEV_CLIENT + ':' + OPENHIM_DEV_CLIENT_PASSWORD).toString('base64')
             }
-        })).json()
-        console.log(response);
-        return response;
+        })
+        let statusCode = response.status;
+        let responseData = await response.json();
+        if (statusCode > 201){
+            return {
+                resourceType: "OperationOutcome",
+                id: "exception",
+                issue: [{
+                    severity: "error",
+                    code: "exception",
+                    details: {
+                        text: `Failed to redirect to dev SHR: Code: ${statusCode}: ${response.statusText}`
+                    }
+                }]
+            }
+        }
+        return responseData;
     } catch (error) {
         return {
-            resourceType: "OperationOutcome"
+            resourceType: "OperationOutcome",
+            id: "exception",
+            issue: [{
+                severity: "error",
+                code: "exception",
+                details: {
+                    text: `${JSON.stringify(error)}`
+                }
+            }]
         }
     }
 

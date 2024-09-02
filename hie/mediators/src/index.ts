@@ -8,10 +8,11 @@ dotenv.config() // Load environment variables
 //Import routes 
 const CRON_INTERVAL = Number(process.env.CRON_INTERVAL ?? 10);
 
-import Auth from './routes/auth'
-import Beneficiary from './routes/beneficiary'
-import Visit from './routes/visit'
-import Callback from './routes/callback'
+import Auth from './routes/auth';
+import Beneficiary from './routes/beneficiary';
+import Visit from './routes/visit';
+import Callback from './routes/callback';
+import Custom from './routes/custom';
 
 import { fetchApprovedEndorsements, fetchVisits } from "./lib/payloadMapping";
 
@@ -37,6 +38,8 @@ app.use('/auth', Auth)
 app.use('/beneficiary', Beneficiary)
 app.use('/visit', Visit)
 app.use('/callback', Callback)
+app.use('/custom', Custom)
+
 
 
 app.listen(PORT, () => {
