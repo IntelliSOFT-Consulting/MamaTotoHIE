@@ -68,8 +68,8 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
     // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
     let n: any = {};
 
-    let phoneNumbers = patient.telecom;
-    phoneNumbers.map((numb: any) => {
+    let phoneNumbers = patient.telecom ?? [];
+    phoneNumbers?.map((numb: any) => {
       if (Object.keys(numb).indexOf('value') > -1) {
         n[numb.system] = numb.value;
       }
@@ -195,7 +195,7 @@ export const fetchVisits = async (status: string | null = null) => {
     console.log(`Fetched ${visits.length} visits`);
     for (let visit of visits) {
       let encounter = await buildEncounter(visit);
-      console.log(encounter);
+      // console.log(encounter);
       // return encounter
     }
     // Save the current timestamp to the file
@@ -218,13 +218,13 @@ export const fetchApprovedEndorsements = async () => {
     for (let i of beneficiaries) {
       console.log(i.membershipNumber);
       let patient = await (await FhirApi({ url: `/Patient?identifier=${i.membershipNumber}` })).data;
-      console.log(patient);
+      // console.log(patient);
       if (patient?.entry) {
         let patientResource = patient?.entry[0]?.resource;
         let carepayPatientRef = { type: { coding: [{ system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref" }] }, value: i.id }
         patientResource.identifier.push(carepayPatientRef);
         // update patient;
-        console.log(patientResource);
+        // console.log(patientResource);
         let updated = await (await FhirApi({
           url: `/Patient/${patient?.entry[0]?.resource?.id}`, method: "PUT",
           data: JSON.stringify({ ...patientResource })

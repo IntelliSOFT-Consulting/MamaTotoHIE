@@ -275,12 +275,13 @@ const OPENHIM_DEV_URL = process.env.OPENHIM_DEV_URL ?? '';
 const OPENHIM_DEV_CLIENT = process.env.OPENHIM_DEV_CLIENT ?? '';
 const OPENHIM_DEV_CLIENT_PASSWORD = process.env.OPENHIM_DEV_CLIENT_PASSWORD ?? '';
 
-export const redirectToDev = async (data: any) => {
+export const redirectToDev = async (path: string ,data: any) => {
     try {
-        let response = await fetch(OPENHIM_DEV_URL, {
+        let response = await fetch(OPENHIM_DEV_URL + path, {
             method: 'POST', body: JSON.stringify(data),
             headers: {
-                "Authorization": 'Basic ' + Buffer.from(OPENHIM_DEV_CLIENT + ':' + OPENHIM_DEV_CLIENT_PASSWORD).toString('base64')
+                "Authorization": 'Basic ' + Buffer.from(OPENHIM_DEV_CLIENT + ':' + OPENHIM_DEV_CLIENT_PASSWORD).toString('base64'),
+                "Content-Type":"application/json"
             }
         })
         let statusCode = response.status;
