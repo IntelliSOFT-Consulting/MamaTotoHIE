@@ -45,7 +45,7 @@ export const getKeycloakUserToken = async (idNumber: string, password: string) =
         return tokenData;
     } catch (error) {
         console.log(error);
-        return null
+        return null;
     }
 }
 
