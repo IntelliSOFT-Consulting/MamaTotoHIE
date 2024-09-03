@@ -214,22 +214,25 @@ export const fetchApprovedEndorsements = async () => {
     let beneficiaries = await (await fetch(cpUrl, {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
     })).json();
-    // console.log(beneficiaries);
+    console.log(`found ${beneficiaries.length} approved beneficiaries`);
     for (let i of beneficiaries) {
-      console.log(i.membershipNumber);
       let patient = await (await FhirApi({ url: `/Patient?identifier=${i.membershipNumber}` })).data;
-      // console.log(patient);
       if (patient?.entry) {
+        console.log(`found ${i.membershipNumber} in the SHR`);
         let patientResource = patient?.entry[0]?.resource;
-        let carepayPatientRef = { type: { coding: [{ system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref" }] }, value: i.id }
-        patientResource.identifier.push(carepayPatientRef);
-        // update patient;
-        // console.log(patientResource);
-        let updated = await (await FhirApi({
-          url: `/Patient/${patient?.entry[0]?.resource?.id}`, method: "PUT",
-          data: JSON.stringify({ ...patientResource })
-        })).data;
-        console.log(updated.id);
+        if (!JSON.stringify(patientResource.identifier).includes("CAREPAY-PATIENT-REF")) {
+          let carepayPatientRef = { type: { coding: [{ system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref" }] }, value: i.id }
+          patientResource.identifier.push(carepayPatientRef);
+          // update patient;
+          console.log(patientResource);
+          let updated = await (await FhirApi({
+            url: `/Patient/${patient?.entry[0]?.resource?.id}`, method: "PUT",
+            data: JSON.stringify({ ...patientResource })
+          })).data;
+          console.log(`...updated Patient/${updated.id} with ${i.membershipNumber} -> ${i.id}`);
+        }else{
+          console.log(`...skipping ${i.membershipNumber} with ref already`);
+        }
       }
     }
     return beneficiaries;
