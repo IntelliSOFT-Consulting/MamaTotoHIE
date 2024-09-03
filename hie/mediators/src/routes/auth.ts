@@ -1,6 +1,6 @@
 import express, { Request, response, Response } from "express";
 import { createClient, getOpenHIMToken, installChannels } from "../lib/utils";
-import { getKeycloakUserToken } from "../lib/keycloak";
+import { getKeycloakAdminToken, getKeycloakUserToken } from "../lib/keycloak";
 
 
 const router = express.Router();
@@ -28,7 +28,8 @@ router.post("/token", async (req: Request, res: Response) => {
     try {
         
         let { username, password } = req.body;
-        let response = await getKeycloakUserToken(username, password);
+        // let response = await getKeycloakUserToken(username, password);
+        let response = await getKeycloakAdminToken()
         // console.log(response);
         res.statusCode = Object.keys(response).indexOf('error') < 0 ? 200 : 401 ;
         res.json({ ...response, status: Object.keys(response).indexOf('error') < 0  ? "success" : "error"  , });
