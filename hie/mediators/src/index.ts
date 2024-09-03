@@ -52,3 +52,4 @@ cron.schedule(`*/${CRON_INTERVAL} * * * *`, () => {
   fetchVisits();
   fetchApprovedEndorsements()
 });
+
