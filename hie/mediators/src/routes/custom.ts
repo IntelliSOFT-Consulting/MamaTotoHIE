@@ -37,7 +37,7 @@ router.post('/Patient', async (req, res) => {
         if (TEST_PHONE_NUMBERS.indexOf(`${data?.telecom?.[0]?.value ?? data?.telecom?.[1]?.value}`) > -1) {
             console.log("...redirecting")
             try {
-                let response = await redirectToDev(data);
+                let response = await redirectToDev("/fhir/Patient", data);
                 if (response.resourceType == "OperationOutcome") {
                     res.statusCode = 400;
                     res.json({
@@ -78,6 +78,101 @@ router.post('/Patient', async (req, res) => {
         // default & production [save to SHR]
         let shrResponse = await (await FhirApi({
             url: '/Patient', method: "POST", data: JSON.stringify(data)
+        })).data;
+        if (shrResponse.resourceType === "OperationOutcome") {
+            res.statusCode = 400;
+            res.json(shrResponse);
+            return;
+        }
+        res.statusCode = 200;
+        res.json(shrResponse);
+        return;
+    } catch (error) {
+        console.error(error);
+        res.statusCode = 400;
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `${JSON.stringify(error)}`
+                }
+            }]
+        });
+        return;
+    }
+});
+
+
+router.post('/QuestionnaireResponse', async (req, res) => {
+    try {
+        let data = req.body;
+        if (data.resourceType != "QuestionnaireResponse") {
+            res.statusCode = 200;
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error",
+                    "code": "exception",
+                    "details": {
+                        "text": `Invalid QuestionnaireResponse Resource`
+                    }
+                }]
+            });
+            return;
+        }
+
+        let patient = await (await FhirApi({ url: `/${data?.subject?.reference}` })).data;
+        // support [test phone number -> dev]
+        console.log(patient);
+        // if (TEST_PHONE_NUMBERS.indexOf(`${patient?.telecom?.[0]?.value ?? patient?.telecom?.[1]?.value}`) > -1) {
+        if (patient.resourceType === "OperationOutcome"){
+            console.log("...redirecting");
+            try {
+                let response = await redirectToDev("/fhir/QuestionnaireResponse", data);
+                if (response.resourceType == "OperationOutcome") {
+                    res.statusCode = 400;
+                    res.json({
+                        "resourceType": "OperationOutcome",
+                        "id": "exception",
+                        "issue": [{
+                            "severity": "error",
+                            "code": "exception",
+                            "details": {
+                                "text": `${JSON.stringify(response)}`
+                            }
+                        }]
+                    });
+                    return;
+
+                }
+                res.statusCode = 200
+                res.json(response);
+                return;
+            } catch (error) {
+                res.statusCode = 400;
+                res.json({
+                    "resourceType": "OperationOutcome",
+                    "id": "exception",
+                    "issue": [{
+                        "severity": "error",
+                        "code": "exception",
+                        "details": {
+                            "text": `${JSON.stringify(error)}`
+                        }
+                    }]
+                });
+                return;
+            }
+
+        }
+
+        // default & production [save to SHR]
+        let shrResponse = await (await FhirApi({
+            url: '/QuestionnaireResponse', method: "POST", data: JSON.stringify(data)
         })).data;
         if (shrResponse.resourceType === "OperationOutcome") {
             res.statusCode = 400;

@@ -68,8 +68,8 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
     // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
     let n: any = {};
 
-    let phoneNumbers = patient.telecom;
-    phoneNumbers.map((numb: any) => {
+    let phoneNumbers = patient.telecom ?? [];
+    phoneNumbers?.map((numb: any) => {
       if (Object.keys(numb).indexOf('value') > -1) {
         n[numb.system] = numb.value;
       }
@@ -195,7 +195,7 @@ export const fetchVisits = async (status: string | null = null) => {
     console.log(`Fetched ${visits.length} visits`);
     for (let visit of visits) {
       let encounter = await buildEncounter(visit);
-      console.log(encounter);
+      // console.log(encounter);
       // return encounter
     }
     // Save the current timestamp to the file
