@@ -74,7 +74,6 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
         n[numb.system] = numb.value;
       }
     })
-    // console.log(n);
 
     let maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
 
@@ -101,8 +100,8 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
       // "height": 140,
       // "weight": -1.7976931348623157e+308,
       // "bmi": -1.7976931348623157e+308,
-      "categoryId": `${mode === "dev" ? CAREPAY_DEV_CATEGORY_ID : CAREPAY_CATEGORY_ID}`,
-      "policyId": `${mode === "dev" ? CAREPAY_DEV_POLICY_ID : CAREPAY_POLICY_ID}`,
+      "categoryId": `${CAREPAY_CATEGORY_ID}`,
+      "policyId": `${CAREPAY_POLICY_ID}`,
       "relationship": "PRIMARY",
       "phoneNumber": n?.phone ?? n?.mobile,
       // "dateOfEnrollment": "2014-02-07",
@@ -188,12 +187,12 @@ export const fetchVisits = async (status: string | null = null) => {
   try {
 
     let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
-    let authToken = await getCarepayAuthToken("prod");
+    let authToken = await getCarepayAuthToken();
     let accessToken = authToken['accessToken'];
     let visits = await (await fetch(cpUrl, {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
     })).json();
-    console.log(`Fetching visits ${visits.length} `);
+    console.log(`Fetched ${visits.length} visits`);
     for (let visit of visits) {
       let encounter = await buildEncounter(visit);
       console.log(encounter);
@@ -207,25 +206,31 @@ export const fetchVisits = async (status: string | null = null) => {
 }
 
 
-export const fetchApprovedEndorsements = async (mode: string = "dev") => {
+export const fetchApprovedEndorsements = async () => {
   try {
-    let dev = mode === "dev";
-    let authToken = await getCarepayAuthToken(mode);
+    let authToken = await getCarepayAuthToken();
     let accessToken = authToken['accessToken'];
-    let cpUrl = `${dev ? CAREPAY_DEV_BASE_URL : CAREPAY_BASE_URL}/beneficiary/beneficiaries?policyIds=${dev ? CAREPAY_DEV_POLICY_ID : CAREPAY_POLICY_ID}`;
+    let cpUrl = `${CAREPAY_BASE_URL}/beneficiary/beneficiaries?policyIds=${CAREPAY_POLICY_ID}`;
     let beneficiaries = await (await fetch(cpUrl, {
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
     })).json();
     // console.log(beneficiaries);
     for (let i of beneficiaries) {
+      console.log(i.membershipNumber);
       let patient = await (await FhirApi({ url: `/Patient?identifier=${i.membershipNumber}` })).data;
-      let patientResource = patient?.entry?.resource;
-      let carepayPatientRef = {type: {coding: [{system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref"}]}, value: i.id}
-        patientResource.identifier[3] = carepayPatientRef
-      // update patient;
-      let updated = await (await FhirApi({ url: `/Patient/${patient?.entry?.resource?.id}`, method: "PUT", 
-        data: JSON.stringify({...patientResource})})).data;
-      console.log(updated.id);
+      console.log(patient);
+      if (patient?.entry) {
+        let patientResource = patient?.entry[0]?.resource;
+        let carepayPatientRef = { type: { coding: [{ system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref" }] }, value: i.id }
+        patientResource.identifier.push(carepayPatientRef);
+        // update patient;
+        console.log(patientResource);
+        let updated = await (await FhirApi({
+          url: `/Patient/${patient?.entry[0]?.resource?.id}`, method: "PUT",
+          data: JSON.stringify({ ...patientResource })
+        })).data;
+        console.log(updated.id);
+      }
     }
     return beneficiaries;
 
@@ -235,37 +240,13 @@ export const fetchApprovedEndorsements = async (mode: string = "dev") => {
 }
 
 
-export const fetchVisitsDev = async () => {
+export const getCarepayAuthToken = async () => {
   try {
-
-    let cpUrl = `${CAREPAY_DEV_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
-    // send payload to carepay
-    let authToken = await getCarepayAuthToken("dev");
-    let accessToken = authToken['accessToken'];
-    let visits = await (await fetch(cpUrl, {
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
-    })).json();
-    console.log(`Fetching visits ${visits.length} `);
-    for (let visit of visits) {
-      let encounter = await buildEncounter(visit);
-      console.log(encounter);
-      // return encounter
-    }
-    // Save the current timestamp to the file
-  } catch (error) {
-    return { error }
-  }
-}
-
-
-export const getCarepayAuthToken = async (mode: string = "dev") => {
-  try {
-    let dev = mode === "dev";
-    let cpLoginUrl = `${dev ? CAREPAY_DEV_BASE_URL : CAREPAY_BASE_URL}/usermanagement/login`;
+    let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
     let accessToken = await (await (fetch(cpLoginUrl, {
       method: "POST", body: JSON.stringify({
-        "username": dev ? CAREPAY_DEV_USERNAME : CAREPAY_USERNAME,
-        "password": dev ? CAREPAY_DEV_PASSWORD : CAREPAY_PASSWORD
+        "username": CAREPAY_USERNAME,
+        "password": CAREPAY_PASSWORD
       }),
       headers: { "Content-Type": "application/json" }
     }))).json();

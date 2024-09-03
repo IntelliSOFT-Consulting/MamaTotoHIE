@@ -14,7 +14,9 @@
           "pathTransform": "s/\/\/.*$/",
           "port": "8080",
           "primary": true,
-          "type": "http"
+          "type": "http",
+          "status":"enabled"
+
         }
       ],
       "allow": ["*"],
@@ -29,7 +31,8 @@
       "path": "/fhir",
       "port": "8080",
       "primary": true,
-      "type": "http"
+      "type": "http",
+      "status":"enabled"
     }
   ]
 }

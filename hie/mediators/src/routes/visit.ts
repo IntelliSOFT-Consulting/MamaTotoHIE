@@ -2,9 +2,6 @@ import express from 'express';
 import { FhirApi, sendTurnNotification } from '../lib/utils';
 import fetch from 'node-fetch';
 
-let SURVEY_FOLLOW_UP_URL = process.env['SURVEY_FOLLOW_UP_URL'] ?? '';
-let TURN_IO_ACCESS_TOKEN = process.env['TURN_IO_ACCESS_TOKEN'] ?? '';
-
 export const router = express.Router();
 
 router.use(express.json());

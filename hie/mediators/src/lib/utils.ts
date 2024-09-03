@@ -2,6 +2,7 @@ import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import carepayBeneficiary from '../config/beneficiaryMediator.json'
 import turnioMediatorConfig from '../config/turnioNotificationsMediator.json';
+import customRegistrationConfig from '../config/customRegistrationMediators.json'
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
@@ -13,7 +14,8 @@ import { RequestInfo, RequestInit } from 'node-fetch';
 const mediators = [
     shrMediatorConfig,
     carepayBeneficiary,
-    turnioMediatorConfig
+    turnioMediatorConfig,
+    customRegistrationConfig
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
@@ -150,7 +152,8 @@ export let createFHIRPatientSubscription = async () => {
     try {
         let FHIR_SUBSCRIPTION_ID = process.env['FHIR_PATIENT_SUBSCRIPTION_ID'];
         let FHIR_SUBSCRIPTION_CALLBACK_URL = process.env['FHIR_SUBSCRIPTION_CALLBACK_URL'];
-        let response = await (await FhirApi({ url:`/Subscription/${FHIR_SUBSCRIPTION_ID}`,
+        let response = await (await FhirApi({
+            url: `/Subscription/${FHIR_SUBSCRIPTION_ID}`,
             method: "PUT", data: JSON.stringify({
                 resourceType: 'Subscription',
                 id: FHIR_SUBSCRIPTION_ID,
@@ -160,10 +163,10 @@ export let createFHIRPatientSubscription = async () => {
                     type: 'rest-hook',
                     endpoint: FHIR_SUBSCRIPTION_CALLBACK_URL,
                     payload: 'application/json'
-                } 
+                }
             })
         })).data
-        if(response.resourceType != "OperationOutcome"){
+        if (response.resourceType != "OperationOutcome") {
             console.log(`FHIR Patient Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
             return;
         }
@@ -177,7 +180,8 @@ export let createEncounterSubscription = async () => {
     try {
         let FHIR_SUBSCRIPTION_ID = process.env['FHIR_ENCOUNTER_SUBSCRIPTION_ID'];
         let FHIR_SUBSCRIPTION_CALLBACK_URL = process.env['FHIR_ENCOUNTER_CALLBACK_URL'];
-        let response = await (await FhirApi({ url:`/Subscription/${FHIR_SUBSCRIPTION_ID}`,
+        let response = await (await FhirApi({
+            url: `/Subscription/${FHIR_SUBSCRIPTION_ID}`,
             method: "PUT", data: JSON.stringify({
                 resourceType: 'Subscription',
                 id: FHIR_SUBSCRIPTION_ID,
@@ -187,10 +191,10 @@ export let createEncounterSubscription = async () => {
                     type: 'rest-hook',
                     endpoint: FHIR_SUBSCRIPTION_CALLBACK_URL,
                     payload: 'application/json'
-                } 
+                }
             })
         })).data
-        if(response.resourceType != "OperationOutcome"){
+        if (response.resourceType != "OperationOutcome") {
             console.log(`FHIR Encounter Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
             return;
         }
@@ -201,14 +205,41 @@ export let createEncounterSubscription = async () => {
 }
 
 
-
+export let createQuestionnaireResponseSubscription = async () => {
+    try {
+        let FHIR_SUBSCRIPTION_ID = process.env['FHIR_QRESPONSE_SUBSCRIPTION_ID'];
+        let FHIR_SUBSCRIPTION_CALLBACK_URL = process.env['FHIR_QRESPONSE_CALLBACK_URL'];
+        let response = await (await FhirApi({
+            url: `/Subscription/${FHIR_SUBSCRIPTION_ID}`,
+            method: "PUT", data: JSON.stringify({
+                resourceType: 'Subscription',
+                id: FHIR_SUBSCRIPTION_ID,
+                status: "active",
+                criteria: 'QuestionnaireResponse?',
+                channel: {
+                    type: 'rest-hook',
+                    endpoint: FHIR_SUBSCRIPTION_CALLBACK_URL,
+                    payload: 'application/json'
+                }
+            })
+        })).data
+        if (response.resourceType != "OperationOutcome") {
+            console.log(`FHIR QR Subscription ID: ${FHIR_SUBSCRIPTION_ID}`);
+            return;
+        }
+        console.log(`Failed to create FHIR Subscription: \n${response}`);
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 
 // these functions will be run anytime during runtime
 
 
-createFHIRPatientSubscription();
-createEncounterSubscription()
+// createFHIRPatientSubscription();
+createEncounterSubscription();
+createQuestionnaireResponseSubscription();
 createClient(process.env['OPENHIM_CLIENT_ID'] || '', process.env['OPENHIM_CLIENT_PASSWORD'] || '');
 
 
@@ -216,24 +247,70 @@ type MessageTypes = "ENROLMENT_CONFIRMATION" | "ENROLMENT_REJECTION" | "SURVEY_F
 
 export const sendTurnNotification = async (data: any, type: MessageTypes) => {
     try {
-      let patient = await (await FhirApi({url: `/${data?.subject?.reference}`})).data;
+        let patient = await (await FhirApi({ url: `/${data?.subject?.reference}` })).data;
 
 
-      let phoneNumber = patient?.telecom?.[0]?.value ?? data?.telecom?.[1]?.value 
+        let phoneNumber = patient?.telecom?.[0]?.value ?? data?.telecom?.[1]?.value
 
 
-      // call mediator
-      let TURN_MEDIATOR_ENDPOINT = process.env['TURN_MEDIATOR_ENDPOINT'] ?? "";
-      let OPENHIM_CLIENT_ID = process.env['OPENHIM_CLIENT_ID'] ?? "";
-      let OPENHIM_CLIENT_PASSWORD = process.env['OPENHIM_CLIENT_PASSWORD'] ?? "";
-      let response = await (await fetch(TURN_MEDIATOR_ENDPOINT, {
-        body: JSON.stringify({phone: phoneNumber, type}),
-        method: "POST",
-        headers:{"Content-Type":"application/json",
-        "Authorization": 'Basic ' + Buffer.from(OPENHIM_CLIENT_ID + ':' + OPENHIM_CLIENT_PASSWORD).toString('base64')}
-      })).json();
-      return response;
+        // call mediator
+        let TURN_MEDIATOR_ENDPOINT = process.env['TURN_MEDIATOR_ENDPOINT'] ?? "";
+        let OPENHIM_CLIENT_ID = process.env['OPENHIM_CLIENT_ID'] ?? "";
+        let OPENHIM_CLIENT_PASSWORD = process.env['OPENHIM_CLIENT_PASSWORD'] ?? "";
+        let response = await (await fetch(TURN_MEDIATOR_ENDPOINT, {
+            body: JSON.stringify({ phone: phoneNumber, type }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": 'Basic ' + Buffer.from(OPENHIM_CLIENT_ID + ':' + OPENHIM_CLIENT_PASSWORD).toString('base64')
+            }
+        })).json();
+        return response;
     } catch (error) {
-        return {error}
+        return { error }
     }
+}
+
+const OPENHIM_DEV_URL = process.env.OPENHIM_DEV_URL ?? '';
+const OPENHIM_DEV_CLIENT = process.env.OPENHIM_DEV_CLIENT ?? '';
+const OPENHIM_DEV_CLIENT_PASSWORD = process.env.OPENHIM_DEV_CLIENT_PASSWORD ?? '';
+
+export const redirectToDev = async (data: any) => {
+    try {
+        let response = await fetch(OPENHIM_DEV_URL, {
+            method: 'POST', body: JSON.stringify(data),
+            headers: {
+                "Authorization": 'Basic ' + Buffer.from(OPENHIM_DEV_CLIENT + ':' + OPENHIM_DEV_CLIENT_PASSWORD).toString('base64')
+            }
+        })
+        let statusCode = response.status;
+        let responseData = await response.json();
+        if (statusCode > 201){
+            return {
+                resourceType: "OperationOutcome",
+                id: "exception",
+                issue: [{
+                    severity: "error",
+                    code: "exception",
+                    details: {
+                        text: `Failed to redirect to dev SHR: Code: ${statusCode}: ${response.statusText}`
+                    }
+                }]
+            }
+        }
+        return responseData;
+    } catch (error) {
+        return {
+            resourceType: "OperationOutcome",
+            id: "exception",
+            issue: [{
+                severity: "error",
+                code: "exception",
+                details: {
+                    text: `${JSON.stringify(error)}`
+                }
+            }]
+        }
+    }
+
 }
