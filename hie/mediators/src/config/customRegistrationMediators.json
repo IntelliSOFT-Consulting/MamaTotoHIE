@@ -6,12 +6,12 @@
     "defaultChannelConfig": [
         {
             "name": "Custom Registration Workflow Channel",
-            "urlPattern": "/custom/Patient",
+            "urlPattern": "/custom",
             "routes": [
                 {
                     "name": "Custom Registration Route",
                     "host": "mediators",
-                    "path": "/custom/Patient",
+                    "path": "/custom",
                     "port": "3000",
                     "primary": true,
                     "type": "http",
@@ -32,7 +32,7 @@
         {
             "name": "Custom Registration Endpoint",
             "host": "mediators",
-            "path": "/custom/Patient",
+            "path": "/custom",
             "port": "3000",
             "primary": true,
             "type": "http",
