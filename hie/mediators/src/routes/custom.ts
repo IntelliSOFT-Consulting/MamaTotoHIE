@@ -11,7 +11,12 @@ const TEST_PHONE_NUMBERS = _TEST_PHONE_NUMBERS.split(",");
 
 export const router = express.Router();
 
-router.use(express.json());
+// router.use(express.json());
+
+// Custom middleware to handle application/fhir+json content type
+router.use(express.json({
+    type: ['application/json', 'application/fhir+json']
+  }));
 
 
 //process FHIR Beneficiary
@@ -39,23 +44,14 @@ router.post('/Patient', async (req, res) => {
             console.log("...redirecting")
             try {
                 let response = await redirectToDev("/fhir/Patient", data);
+                console.log(JSON.stringify(response));
                 if (response.resourceType == "OperationOutcome") {
                     res.statusCode = 400;
-                    res.json({
-                        "resourceType": "OperationOutcome",
-                        "id": "exception",
-                        "issue": [{
-                            "severity": "error",
-                            "code": "exception",
-                            "details": {
-                                "text": `${JSON.stringify(response)}`
-                            }
-                        }]
-                    });
+                    res.json(response);
                     return;
 
                 }
-                res.statusCode = 200
+                res.statusCode = 201
                 res.json(response);
                 return;
             } catch (error) {
@@ -136,21 +132,10 @@ router.post('/QuestionnaireResponse', async (req, res) => {
                 let response = await redirectToDev("/fhir/QuestionnaireResponse", data);
                 if (response.resourceType == "OperationOutcome") {
                     res.statusCode = 400;
-                    res.json({
-                        "resourceType": "OperationOutcome",
-                        "id": "exception",
-                        "issue": [{
-                            "severity": "error",
-                            "code": "exception",
-                            "details": {
-                                "text": `${JSON.stringify(response)}`
-                            }
-                        }]
-                    });
+                    res.json(response);
                     return;
-
                 }
-                res.statusCode = 200
+                res.statusCode = 201
                 res.json(response);
                 return;
             } catch (error) {
