@@ -49,7 +49,7 @@ app.listen(PORT, () => {
 // Set up a cron job to run every three minutes
 cron.schedule(`*/${CRON_INTERVAL} * * * *`, () => {
   console.log(`Cron job running every ${CRON_INTERVAL} minutes`);
-  // fetchVisits();
+  fetchVisits();
   fetchApprovedEndorsements()
 });
 

@@ -6,12 +6,12 @@
     "defaultChannelConfig": [
         {
             "name": "Custom Registration Workflow Channel",
-            "urlPattern": "/custom",
+            "urlPattern": "^/custom/.*$",
             "routes": [
                 {
                     "name": "Custom Registration Route",
                     "host": "mediators",
-                    "path": "/custom",
+                    "pathTransform": "s/\/\/.*$/",
                     "port": "3000",
                     "primary": true,
                     "type": "http",

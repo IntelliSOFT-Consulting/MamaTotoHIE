@@ -135,7 +135,7 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
 export const buildEncounter = async (visit: any) => {
   try {
     let patient = await (await FhirApi({ url: `/Patient?identifier=${visit.patientRef}` })).data;
-    // console.log(patient);
+    console.log(patient);
     if (!(patient?.total) || !(patient?.entry)) {
       return { "error": "Patient not found" }
     }

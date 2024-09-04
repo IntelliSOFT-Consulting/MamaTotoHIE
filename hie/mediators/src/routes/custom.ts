@@ -18,8 +18,9 @@ router.use(express.json());
 router.post('/Patient', async (req, res) => {
     try {
         let data = req.body;
-        if (data.resourceType != "Patient") {
-            res.statusCode = 200;
+        console.log(data);
+        if (data.resourceType !== "Patient") {
+            res.statusCode = 400;
             res.json({
                 "resourceType": "OperationOutcome",
                 "id": "exception",
@@ -109,8 +110,8 @@ router.post('/Patient', async (req, res) => {
 router.post('/QuestionnaireResponse', async (req, res) => {
     try {
         let data = req.body;
-        if (data.resourceType != "QuestionnaireResponse") {
-            res.statusCode = 200;
+        if (data.resourceType !== "QuestionnaireResponse") {
+            res.statusCode = 400;
             res.json({
                 "resourceType": "OperationOutcome",
                 "id": "exception",
