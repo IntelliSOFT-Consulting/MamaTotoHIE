@@ -25,7 +25,7 @@ export interface Session {
 /**
  * Identical to the Session type, but without the `issued` and `expires` properties.
  */
-export type PartialSession = Omit<Session, "issued" | "expires">;
+export type PartialSession = Omit<Session, 'issued' | 'expires'>;
 
 export interface EncodeResult {
     token: string,
@@ -35,16 +35,16 @@ export interface EncodeResult {
 
 export type DecodeResult =
     | {
-          type: "valid";
+          type: 'valid';
           session: Session;
       }
     | {
-          type: "integrity-error";
+          type: 'integrity-error';
       }
     | {
-          type: "invalid-token";
+          type: 'invalid-token';
       };
 
 
 
-export type ExpirationStatus = "expired" | "active" | "grace";
+export type ExpirationStatus = 'expired' | 'active' | 'grace';
