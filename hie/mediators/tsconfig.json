@@ -2,16 +2,17 @@
     "compilerOptions": {
       "target": "es6",
       "module": "commonjs",
-      "rootDir": "./src",
+      "rootDir": ".",
       "skipLibCheck": true, /* Skip type checking all .d.ts files. */
       "outDir": "./build",
       "esModuleInterop": true,
       "strict": true,
       "resolveJsonModule": true,
-      "typeRoots": ["src/@types", "node_modules/@types"]
+      "typeRoots": ["src/@types", "node_modules/@types"],
+      "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
     },
-    
     "include": [
-      "src"
+      "src/**/*.ts",
+      "scripts"
     ]
 }

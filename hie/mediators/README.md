@@ -1,28 +1,32 @@
+# About
 
+This projects creates RESTful API that acts as mediator in an openhim transaction. It is built using Node.js, Express.js and TypeScript.
 
+## Development
 
+### run the project in development mode
 
-#### Development Mode
+`yarn dev` will start the application with hot reloading.
 
-`yarn dev`
+### linting
 
-#### Production
+`yarn lint` will check for linting errors.
 
-First ensure you build the project with tsc.
+## Production
+
+### build the project with tsc.
 
 `yarn build`
 
+### Run the production build.
 
-Run the production build.
+`yarn start` (must be run after building the project)
 
-`yarn start`
-
-
-#### Using Docker
+## Using Docker
 
 `docker-compose up -d --build`
 
 This should bring up the application.
 By default, the application will be exposed on port 8080
 
-Visiting http://YOUR-IP-HERE:8080 should display the Swagger UI Docs for the application.
+Visiting <http://YOUR-IP-HERE:8080> should display the Swagger UI Docs for the application.
