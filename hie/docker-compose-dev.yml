@@ -87,24 +87,24 @@ services:
             - ./default.json:/usr/share/nginx/html/config/default.json
             - /etc/ssl/crt:/etc/nginx/certs
 
-    mediators:
-        depends_on:
-            - openhim-core
-            - hapi-fhir-jpa
-        container_name: mediators
-        restart: on-failure
-        build:
-            context: mediators
-            dockerfile: Dockerfile.dev
-        volumes:
-            - ./mediators:/usr/mediators
-        networks:
-            - openhim
-            - hapi-fhir
-        ports:
-            - "8082:3000"
-        env_file:
-            - mediators/.env
+    # mediators:
+    #     depends_on:
+    #         - openhim-core
+    #         - hapi-fhir-jpa
+    #     container_name: mediators
+    #     restart: on-failure
+    #     build:
+    #         context: mediators
+    #         dockerfile: Dockerfile.dev
+    #     volumes:
+    #         - ./mediators:/usr/mediators
+    #     networks:
+    #         - openhim
+    #         - hapi-fhir
+    #     ports:
+    #         - "8082:3000"
+    #     env_file:
+    #         - mediators/.env
     nginx:
         image: nginx:alpine
         container_name: nginx

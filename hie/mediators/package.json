@@ -10,6 +10,7 @@
     "jet-logger": "^2.0.1",
     "jwt-simple": "^0.5.6",
     "mime-types": "^2.1.35",
+    "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
@@ -42,12 +43,14 @@
     "nodemon": "^2.0.7",
     "react-error-overlay": "6.0.9",
     "ts-node": "^9.1.1",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.13.0"
   },
   "scripts": {
-    "dev": "nodemon ./src/index.ts -w ./src",
-    "start": "node ./build/index.js",
+    "dev": "NODE_ENV=development ts-node ./src/index.ts",
+    "dev:hot": "nodemon --exec \"yarn dev\" -w ./src -e ts",
+    "start": "node -r ./preload.js ./build/index.js",
     "build": "ts-node ./scripts/build.ts",
     "lint": "eslint ./src"
   }

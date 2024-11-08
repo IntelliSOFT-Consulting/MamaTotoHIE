@@ -5,10 +5,8 @@
 
 export default {
   Auth: {
-    Base: '/users',
-    Get: '/all',
-    Add: '/add',
-    Update: '/update',
-    Delete: '/delete/:id',
+    Base: '/auth',
+    GetToken: '/token',
+    AuthenticateClient: '/client',
   },
 } as const;

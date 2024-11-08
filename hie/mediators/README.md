@@ -6,7 +6,8 @@ This projects creates RESTful API that acts as mediator in an openhim transactio
 
 ### run the project in development mode
 
-`yarn dev` will start the application with hot reloading.
+`yarn dev` will start the application in development mode.
+`yarn dev:hot` will start the application in dev mode with hot reloading.
 
 ### linting
 

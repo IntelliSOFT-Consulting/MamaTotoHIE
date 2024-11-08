@@ -1,6 +1,9 @@
-import express, { Request, response, Response } from 'express';
-import { createClient, getOpenHIMToken, installChannels } from '../lib/utils';
-import { getKeycloakAdminToken, getKeycloakUserToken } from '../lib/keycloak';
+import express from 'express';
+import { createClient, getOpenHIMToken } from '../lib/utils';
+import { getKeycloakAdminToken } from '../lib/keycloak';
+import { IReq, IRes } from './common/types';
+import logger from 'jet-logger';
+import HttpStatusCodes from '@src/common/HttpStatusCodes';
 
 
 const router = express.Router();
@@ -17,55 +20,54 @@ router.use(express.json());
 //     }
 //     catch (error) {
 //         console.log(error);
-//         res.statusCode = 401;
+//         res.statusCode = HttpStatusCodes.UNAUTHORIZED;
 //         res.json({ error: "incorrect email or password" });
 //         return;
 //     }
 // });
 
 // Login
-router.post('/token', async (req: Request, res: Response) => {
+
+async function getToken(_: IReq, res: IRes) {
   try {
-        
-    const { username, password } = req.body;
-    // let response = await getKeycloakUserToken(username, password);
     const response = await getKeycloakAdminToken();
-    // console.log(response);
-    res.statusCode = !Object.keys(response).includes('error') ? 200 : 401 ;
+    res.statusCode = !Object.keys(response).includes('error') ? HttpStatusCodes.OK : HttpStatusCodes.UNAUTHORIZED ;
     res.json({ ...response, status: !Object.keys(response).includes('error')  ? 'success' : 'error'   });
-    return;
   }
   catch (error) {
-    console.log(error);
-    res.statusCode = 401;
+    logger.err(error);
+    res.statusCode = HttpStatusCodes.UNAUTHORIZED;
     res.json({ error: 'incorrect email or password', status: 'error' });
-    return;
   }
-});
+
+}
 
 
 
 // Login
-router.post('/client', async (req: Request, res: Response) => {
+const authenticateClient = async (req: IReq, res: IRes) =>  {
   try {
     await getOpenHIMToken();
-    const { name, password } = req.body;
+    const { name, password } = req.body as { name: string; password: string };
     const response = await createClient(name, password);
     if (response === 'Unauthorized' || response.includes('error')) {
-      res.statusCode = 401;
+      res.statusCode = HttpStatusCodes.UNAUTHORIZED;
       res.json({ status: 'error', error: response });
       return;
     }
-    res.statusCode = 201;
+    res.statusCode = HttpStatusCodes.CREATED;
     res.json({ status: 'success', response });
     return;
   }
   catch (error) {
-    console.log(error);
-    res.statusCode = 401;
+    logger.err(error);
+    res.statusCode = HttpStatusCodes.UNAUTHORIZED;
     res.json({ error: 'incorrect email or password', status: 'error' });
     return;
   }
-});
+};
 
-export default router;
+export default { 
+  getToken,
+  authenticateClient 
+} as const;
