@@ -1,5 +1,5 @@
 import express from 'express';
-import { FhirApi, redirectToDev, sendTurnNotification } from '../lib/utils';
+import { FhirApi, redirectToDev } from '../lib/utils';
 
 
 const _TEST_PHONE_NUMBERS = process.env.TEST_PHONE_NUMBERS ?? '';

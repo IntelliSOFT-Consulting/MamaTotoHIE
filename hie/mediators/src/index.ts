@@ -4,8 +4,8 @@ import cron from 'node-cron';
 import morgan from 'morgan';
 import logger from 'jet-logger';
 
-//Import routes 
-import Auth from './routes/auth';
+//Import routes
+import BaseRouter from '@src/routes';
 import Beneficiary from './routes/beneficiary';
 import Visit from './routes/visit';
 import Callback from './routes/callback';
@@ -17,12 +17,15 @@ import { NodeEnvs } from '@src/common/misc';
 
 import HttpStatusCodes from '@src/common/HttpStatusCodes';
 import { RouteError } from '@src/common/classes';
-import BaseRouter from '@src/routes';
+import { activateOpenHimConfigs } from '@src/lib/utils';
+
 
 
 const app = express();
 
 app.use(cors());
+
+app.use(express.json());
 
 // Show routes called in console during development
 if (EnvVars.NodeEnv === NodeEnvs.Dev.valueOf()) {
@@ -60,16 +63,18 @@ app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
   return next(err);
 });
 
+// Load openhim Defaults
+activateOpenHimConfigs()
 
 
 app.listen(EnvVars.Port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${EnvVars.Port}`);
+  logger.info(`⚡️[server]: Server is running at http://localhost:${EnvVars.Port}`);
 });
 
 // Set up a cron job to run every three minutes
-cron.schedule(`*/${EnvVars.CRON_INTERVAL} * * * *`, () => {
-  console.log(`Cron job running every ${EnvVars.CRON_INTERVAL} minutes`);
-  fetchVisits();
-  fetchApprovedEndorsements();
-});
+// cron.schedule(`*/${EnvVars.CRON_INTERVAL} * * * *`, () => {
+//   console.log(`Cron job running every ${EnvVars.CRON_INTERVAL} minutes`);
+//   fetchVisits();
+//   fetchApprovedEndorsements();
+// });
 

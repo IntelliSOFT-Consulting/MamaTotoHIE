@@ -9,4 +9,8 @@ export default {
     GetToken: '/token',
     AuthenticateClient: '/client',
   },
+  HeyForm: {
+    Base: '/hey_form',
+    Webhook: '/webhook',
+  }
 } as const;

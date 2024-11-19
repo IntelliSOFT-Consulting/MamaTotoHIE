@@ -1,13 +1,8 @@
-import express from 'express';
 import { createClient, getOpenHIMToken } from '../lib/utils';
 import { getKeycloakAdminToken } from '../lib/keycloak';
-import { IReq, IRes } from './common/types';
+import { IReq, IRes } from '@src/routes/common/types';
 import logger from 'jet-logger';
 import HttpStatusCodes from '@src/common/HttpStatusCodes';
-
-
-const router = express.Router();
-router.use(express.json());
 
 // // Login
 // router.get("/token", async (req: Request, res: Response) => {
