@@ -1,8 +1,8 @@
-## Pharmaccess
+# Pharmaccess
 
 This repository contains the code and artefacts for the MamaToto HIE
 
-#### Components
+## Components
 
 Based on the Instant v2 Packaging, developed by Jembi Systems, the system is contains the following components;
 
@@ -12,33 +12,36 @@ Based on the Instant v2 Packaging, developed by Jembi Systems, the system is con
 4. Keycloak
 5. Nginx Proxy
 
-
-Pre-requisites
+## Pre-requisites
 
 1. Docker - Instructions on how to install Docker can be found on the Docker website
             This repository relies heavily on Docker containers.
 
-2. Instant v2 CLI - Installation instructions [here](https://jembi.gitbook.io/instant-v2/getting-started/quick-start): 
+2. Instant v2 CLI - Installation instructions [here](https://jembi.gitbook.io/instant-v2/getting-started/quick-start)
 
-#### Setup Instructions
+## Setup Instructions
 
 Simply run
 
 `instant project up`
 
-#### Instant HIE
+## Running The Instant HIE
 
 1. Clone the repository
 
-```git clone https://github.com/IntelliSOFT-Consulting/mamatoto-hie```
+    ```git clone https://github.com/PharmAccess/MamaToto-HIE.git```
 
 2. cd into the repository folder
 
-```cd pharmaccess```
+    ```cd MamaToto-HIE```
 
+3. create a .env file from the .env.example file and modify the values as needed
 
-3. Use docker compose to start containers
+    ```bash
+    cp ./hie/.env.example ./hie/.env
+    cp ./hie/mediators/.env.example ./hie/mediators/.env
+    ```
 
-```sudo ./start-hie.sh```
+4. Use docker compose to start containers
 
-
+    ```sudo ./start-hie.sh```

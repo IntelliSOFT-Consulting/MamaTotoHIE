@@ -1,18 +1,18 @@
-import { FhirApi } from "./utils";
+import { FhirApi } from './utils';
 import path from 'path';
 import fs from 'fs';
 
-const CAREPAY_BASE_URL = process.env['CAREPAY_BASE_URL'];
-const CAREPAY_CATEGORY_ID = process.env['CAREPAY_CATEGORY_ID'];
-const CAREPAY_USERNAME = process.env['CAREPAY_USERNAME'];
-const CAREPAY_PASSWORD = process.env['CAREPAY_PASSWORD'];
-const CAREPAY_POLICY_ID = process.env['CAREPAY_POLICY_ID'];
+const CAREPAY_BASE_URL = process.env.CAREPAY_BASE_URL;
+const CAREPAY_CATEGORY_ID = process.env.CAREPAY_CATEGORY_ID;
+const CAREPAY_USERNAME = process.env.CAREPAY_USERNAME;
+const CAREPAY_PASSWORD = process.env.CAREPAY_PASSWORD;
+const CAREPAY_POLICY_ID = process.env.CAREPAY_POLICY_ID;
 
-const CAREPAY_DEV_BASE_URL = process.env['CAREPAY_DEV_BASE_URL'];
-const CAREPAY_DEV_CATEGORY_ID = process.env['CAREPAY_DEV_CATEGORY_ID'];
-const CAREPAY_DEV_USERNAME = process.env['CAREPAY_DEV_USERNAME'];
-const CAREPAY_DEV_PASSWORD = process.env['CAREPAY_DEV_PASSWORD'];
-const CAREPAY_DEV_POLICY_ID = process.env['CAREPAY_DEV_POLICY_ID'];
+const CAREPAY_DEV_BASE_URL = process.env.CAREPAY_DEV_BASE_URL;
+const CAREPAY_DEV_CATEGORY_ID = process.env.CAREPAY_DEV_CATEGORY_ID;
+const CAREPAY_DEV_USERNAME = process.env.CAREPAY_DEV_USERNAME;
+const CAREPAY_DEV_PASSWORD = process.env.CAREPAY_DEV_PASSWORD;
+const CAREPAY_DEV_POLICY_ID = process.env.CAREPAY_DEV_POLICY_ID;
 
 
 
@@ -37,17 +37,17 @@ const getCurrentDate = () => new Date().toISOString().slice(0, 10);
 
 export const processIdentifiers = async (identifiers: any) => {
   try {
-    let ids: any = {};
-    for (let id of identifiers) {
-      let idType = id?.type?.coding[0].code;
-      let idSystem = id?.type?.coding[0].system;
+    const ids: any = {};
+    for (const id of identifiers) {
+      const idType = id?.type?.coding[0].code;
+      const idSystem = id?.type?.coding[0].system;
       ids[idType] = id?.value;
     }
     return ids;
   } catch (error) {
-    return {}
+    return {};
   }
-}
+};
 
 function generateRandomString(length: number) {
   let result = '';
@@ -61,51 +61,51 @@ function generateRandomString(length: number) {
 
 
 
-export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string = "dev") => {
+export const fhirPatientToCarepayBeneficiary = async (patient: any, mode = 'dev') => {
   try {
-    let gender = String(patient.gender).toUpperCase();
-    let _date = String(patient.birthDate).split("-");
+    const gender = String(patient.gender).toUpperCase();
+    const _date = String(patient.birthDate).split('-');
     // console.log(`${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,)
-    let n: any = {};
+    const n: any = {};
 
-    let phoneNumbers = patient.telecom ?? [];
+    const phoneNumbers = patient.telecom ?? [];
     phoneNumbers?.map((numb: any) => {
-      if (Object.keys(numb).indexOf('value') > -1) {
+      if (Object.keys(numb).includes('value')) {
         n[numb.system] = numb.value;
       }
-    })
+    });
 
-    let maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
+    const maritalStatus = patient?.maritalStatus?.coding?.[0]?.code;
 
     return {
-      "title": gender == "MALE" ? "MR" : "MRS",
-      "firstName": patient.name[0].given[0] ?? "",
-      ...(patient.name[0].given[1] ? true : false) && { "middleName": patient.name[0].given[1] },
-      ...(patient.name[0].family ? true : false) && { "lastName": patient.name[0].family },
-      "gender": gender,
-      "dateOfBirth": patient.birthDate,
+      'title': gender == 'MALE' ? 'MR' : 'MRS',
+      'firstName': patient.name[0].given[0] ?? '',
+      ...(patient.name[0].given[1] ? true : false) && { 'middleName': patient.name[0].given[1] },
+      ...(patient.name[0].family ? true : false) && { 'lastName': patient.name[0].family },
+      'gender': gender,
+      'dateOfBirth': patient.birthDate,
       // "dateOfBirth":  `${_date[0]}-${_date[2].padStart(2, '0')}-${_date[1].padStart(2, '0')}`,
-      "maritalStatus": maritalStatus === "M" ? "MARRIED" : "SINGLE",
+      'maritalStatus': maritalStatus === 'M' ? 'MARRIED' : 'SINGLE',
       // "nationality": "KE",
-      "identification": [
+      'identification': [
         {
-          "type": "NATIONAL_ID",
-          "number": `${patient?.identifier?.[0]?.value}`
-        }
+          'type': 'NATIONAL_ID',
+          'number': `${patient?.identifier?.[0]?.value}`,
+        },
       ],
       // "acceptTermsAndCondition": true,
       // "occupation": "EMPLOYED",
       // "email": `${(patient.name[0].given[0]).replace(" ", "-") ?? ""}@gmail.com`,
-      "residentialCountryCode": "string",
+      'residentialCountryCode': 'string',
       // "height": 140,
       // "weight": -1.7976931348623157e+308,
       // "bmi": -1.7976931348623157e+308,
-      "categoryId": `${CAREPAY_CATEGORY_ID}`,
-      "policyId": `${CAREPAY_POLICY_ID}`,
-      "relationship": "PRIMARY",
-      "phoneNumber": n?.phone ?? n?.mobile,
+      'categoryId': `${CAREPAY_CATEGORY_ID}`,
+      'policyId': `${CAREPAY_POLICY_ID}`,
+      'relationship': 'PRIMARY',
+      'phoneNumber': n?.phone ?? n?.mobile,
       // "dateOfEnrollment": "2014-02-07",
-      "startDate": new Date().toISOString(),
+      'startDate': new Date().toISOString(),
       // "endDate": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
       // "medicalApplicationForm": {
       //   "mafConditions": [
@@ -124,58 +124,58 @@ export const fhirPatientToCarepayBeneficiary = async (patient: any, mode: string
       //   ],
       //   "signatureDate": getCurrentDate()
       // }
-    }
+    };
   }
   catch (error) {
     console.log(error);
     return null;
   }
-}
+};
 
 export const buildEncounter = async (visit: any) => {
   try {
-    let patient = await (await FhirApi({ url: `/Patient?identifier=${visit.patientRef}` })).data;
+    const patient = await (await FhirApi({ url: `/Patient?identifier=${visit.patientRef}` })).data;
     console.log(patient);
     if (!(patient?.total) || !(patient?.entry)) {
-      return { "error": "Patient not found" }
+      return { 'error': 'Patient not found' };
     }
-    let status = String(visit.status).toLowerCase();
-    let encounterPayload = {
-      resourceType: "Encounter",
+    const status = String(visit.status).toLowerCase();
+    const encounterPayload = {
+      resourceType: 'Encounter',
       id: visit.code,
-      status: (status === "closed") ? "finished" : status,
+      status: (status === 'closed') ? 'finished' : status,
       subject: {
-        reference: `Patient/${patient?.entry[0].resource?.id}`
+        reference: `Patient/${patient?.entry[0].resource?.id}`,
       },
       period: {
         start: visit.date,
-        end: visit.endDate
+        end: visit.endDate,
       },
       extension: [
         {
-          url: "https://mamatoto.dev/StructureDefinition/patient-benefit",
+          url: 'https://mamatoto.dev/StructureDefinition/patient-benefit',
           valueReference: {
-            reference: `Coverage/${visit.benefitRef}`
-          }
+            reference: `Coverage/${visit.benefitRef}`,
+          },
         },
         {
-          url: "https://mamatoto.dev/StructureDefinition/patient-plan",
+          url: 'https://mamatoto.dev/StructureDefinition/patient-plan',
           valueReference: {
-            reference: `Coverage/${visit.planRef}`
-          }
+            reference: `Coverage/${visit.planRef}`,
+          },
         },
       ],
       serviceProvider: {
-        reference: `Organization/${visit.providerRef}`
-      }
-    }
-    let encounter = await FhirApi({ url: `/Encounter/${encounterPayload.id}`, method: "PUT", data: JSON.stringify(encounterPayload) });
+        reference: `Organization/${visit.providerRef}`,
+      },
+    };
+    const encounter = await FhirApi({ url: `/Encounter/${encounterPayload.id}`, method: 'PUT', data: JSON.stringify(encounterPayload) });
     // console.log(encounter);
     return encounter;
   } catch (error) {
     return { error };
   }
-}
+};
 const getLastYearISOString = () => {
   const now = new Date();
   const yesterday = new Date(now);
@@ -186,48 +186,48 @@ const getLastYearISOString = () => {
 export const fetchVisits = async (status: string | null = null) => {
   try {
 
-    let cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
-    let authToken = await getCarepayAuthToken();
-    let accessToken = authToken['accessToken'];
-    let visits = await (await fetch(cpUrl, {
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
+    const cpUrl = `${CAREPAY_BASE_URL}/visit/visits?since=${getLastYearISOString()}`;
+    const authToken = await getCarepayAuthToken();
+    const accessToken = authToken.accessToken;
+    const visits = await (await fetch(cpUrl, {
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
     })).json();
     console.log(`Fetched ${visits.length} visits`);
-    for (let visit of visits) {
-      let encounter = await buildEncounter(visit);
+    for (const visit of visits) {
+      const encounter = await buildEncounter(visit);
       // console.log(encounter);
       // return encounter
     }
     // Save the current timestamp to the file
     // fs.writeFileSync(LAST_RUN_FILE, new Date().toISOString());
   } catch (error) {
-    return { error }
+    return { error };
   }
-}
+};
 
 
 export const fetchApprovedEndorsements = async () => {
   try {
-    let authToken = await getCarepayAuthToken();
-    let accessToken = authToken['accessToken'];
-    let cpUrl = `${CAREPAY_BASE_URL}/beneficiary/beneficiaries?policyIds=${CAREPAY_POLICY_ID}`;
-    let beneficiaries = await (await fetch(cpUrl, {
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` }
+    const authToken = await getCarepayAuthToken();
+    const accessToken = authToken.accessToken;
+    const cpUrl = `${CAREPAY_BASE_URL}/beneficiary/beneficiaries?policyIds=${CAREPAY_POLICY_ID}`;
+    const beneficiaries = await (await fetch(cpUrl, {
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
     })).json();
     console.log(`found ${beneficiaries.length} approved beneficiaries`);
-    for (let i of beneficiaries) {
-      let patient = await (await FhirApi({ url: `/Patient?identifier=${i.membershipNumber}` })).data;
+    for (const i of beneficiaries) {
+      const patient = await (await FhirApi({ url: `/Patient?identifier=${i.membershipNumber}` })).data;
       if (patient?.entry) {
         console.log(`found ${i.membershipNumber} in the SHR`);
-        let patientResource = patient?.entry[0]?.resource;
-        if (!JSON.stringify(patientResource.identifier).includes("CAREPAY-PATIENT-REF")) {
-          let carepayPatientRef = { type: { coding: [{ system: "http://carepay.com", code: "CAREPAY-PATIENT-REF", display: "Carepay Patient Ref" }] }, value: i.id }
+        const patientResource = patient?.entry[0]?.resource;
+        if (!JSON.stringify(patientResource.identifier).includes('CAREPAY-PATIENT-REF')) {
+          const carepayPatientRef = { type: { coding: [{ system: 'http://carepay.com', code: 'CAREPAY-PATIENT-REF', display: 'Carepay Patient Ref' }] }, value: i.id };
           patientResource.identifier.push(carepayPatientRef);
           // update patient;
           console.log(patientResource);
-          let updated = await (await FhirApi({
-            url: `/Patient/${patient?.entry[0]?.resource?.id}`, method: "PUT",
-            data: JSON.stringify({ ...patientResource })
+          const updated = await (await FhirApi({
+            url: `/Patient/${patient?.entry[0]?.resource?.id}`, method: 'PUT',
+            data: JSON.stringify({ ...patientResource }),
           })).data;
           console.log(`...updated Patient/${updated.id} with ${i.membershipNumber} -> ${i.id}`);
         }else{
@@ -240,21 +240,21 @@ export const fetchApprovedEndorsements = async () => {
   } catch (error) {
     return false;
   }
-}
+};
 
 
 export const getCarepayAuthToken = async () => {
   try {
-    let cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
-    let accessToken = await (await (fetch(cpLoginUrl, {
-      method: "POST", body: JSON.stringify({
-        "username": CAREPAY_USERNAME,
-        "password": CAREPAY_PASSWORD
+    const cpLoginUrl = `${CAREPAY_BASE_URL}/usermanagement/login`;
+    const accessToken = await (await (fetch(cpLoginUrl, {
+      method: 'POST', body: JSON.stringify({
+        'username': CAREPAY_USERNAME,
+        'password': CAREPAY_PASSWORD,
       }),
-      headers: { "Content-Type": "application/json" }
+      headers: { 'Content-Type': 'application/json' },
     }))).json();
     return accessToken;
   } catch (error) {
     return null;
   }
-}
+};
