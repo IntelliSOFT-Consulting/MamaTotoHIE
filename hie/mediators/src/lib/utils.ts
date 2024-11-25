@@ -36,11 +36,12 @@ const openhimConfig = {
 
 export const activateOpenHimConfigs = async () => {
   utils.authenticate(openhimConfig, (e: any) => {
+    logger.info("🔐 Checking OpenHIM username");
     if (e) {
       logger.err(e);
       return;
     }
-    logger.info("✅ OpenHIM authenticated successfully");
+    logger.info("✅ OpenHIM Username exists");
     importMediators();
     installChannels();
   });
@@ -61,22 +62,17 @@ export const activateOpenHimConfigs = async () => {
 // }
 
 const importMediators = () => {
-  try {
-    mediators.map((mediator: any) => {
-      utils.registerMediator(openhimConfig, mediator, (e: any) => {
-        e
-          ? logger.err(e)
-          : logger.info(`✅ ${mediator.name} registered successfully`);
-      });
+  mediators.map((mediator: any) => {
+    utils.registerMediator(openhimConfig, mediator, (e: any) => {
+      e
+        ? logger.err(`❌ ${mediator.name} registration failed: ${e}`)
+        : logger.info(`✅ ${mediator.name} registered successfully`);
     });
-  } catch (error) {
-    logger.err(error);
-  }
+  });
 };
 
 export const getOpenHIMToken = async () => {
   try {
-    // console.log("Auth", auth)
     const token = await utils.genAuthHeaders(openhimConfig);
     return token;
   } catch (error) {
@@ -96,9 +92,10 @@ const checkStatus = (response: { statusText: any; ok: any }) => {
 };
 
 const createMediatorChannel = async (mediator: Mediator) => {
-  const headers = await getOpenHIMToken();
+  const authHeaders = await utils.genAuthHeaders(openhimConfig);
+ 
   const options = {
-    headers: { ...headers, "Content-Type": "application/json" },
+    headers: { ...authHeaders, "Content-Type": "application/json" },
     method: "POST",
     body: JSON.stringify(mediator.defaultChannelConfig),
     agent: new Agent({
@@ -110,22 +107,30 @@ const createMediatorChannel = async (mediator: Mediator) => {
     checkStatus(response);
     logger.info(`✅ Channel created for ${mediator.name}`);
   } catch (error) {
-    logger.err(`❌ Failed to create channel for ${mediator.name}`);
+    logger.err(`❌ Failed to create channel for ${mediator.name}: ${error}`);
   }
 };
 
 const getChannelNames = async () => {
-  const headers = await getOpenHIMToken();
+  const authHeaders = await utils.genAuthHeaders(openhimConfig);
+
   const response = await fetch(`${openhimConfig.apiURL}/channels`, {
-    headers: { ...headers, "Content-Type": "application/json" },
+    headers: { ...authHeaders, "Content-Type": "application/json" },
     method: "GET",
     agent: new Agent({
       rejectUnauthorized: false,
     }),
   });
-  const channels = await response.json();
-  const names = channels.map((channel: any) => channel.name);
-  return names;
+  
+  try {
+    checkStatus(response);
+    const channels = await response.json();
+    const names = channels.map((channel: any) => channel.name);
+    return names;
+  } catch (error) {
+    logger.err(`❌ Failed to get channel names: ${error}`);
+    return [];
+  }
 };
 
 const installChannels = async () => {
